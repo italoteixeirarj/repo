@@ -115,14 +115,21 @@ def main():
                 if formato_exportacao in ["CSV (.csv)", "Ambos"]:
                     csv_data = []
                     for questao in questoes:
+                        respostas = [questao["Opção A"], questao["Opção B"], questao["Opção C"], questao["Opção D"], questao["Opção E"]]
+                        alternativas_corretas = []
+                        for idx, resposta in enumerate(respostas):
+                            if resposta in questao["Resposta(s) Correta(s)"]:
+                                alternativas_corretas.append(chr(65 + idx))
                         csv_data.append({
-                            "Question": questao["Pergunta"],
+                            "Question Title": questao["Pergunta"],
+                            "Question Text": questao["Pergunta"],
                             "Answer 1": questao["Opção A"],
                             "Answer 2": questao["Opção B"],
                             "Answer 3": questao["Opção C"],
                             "Answer 4": questao["Opção D"],
                             "Answer 5": questao["Opção E"],
-                            "Correct Answer(s)": questao["Resposta(s) Correta(s)"],
+                            "Multiple Correct": "True" if len(alternativas_corretas) > 1 else "False",
+                            "Correct Answer(s)": ";".join(alternativas_corretas),
                             "Explanation": questao["Explicação"]
                         })
 
