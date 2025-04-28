@@ -1,0 +1,22 @@
+/* Estilos principais para as tiles */
+.tile {
+    background-color: #f0f2f6;
+    padding: 30px;
+    border-radius: 16px;
+    text-align: center;
+    font-size: 22px;
+    font-weight: 600;
+    box-shadow: 2px 2px 12px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    min-height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tile:hover {
+    background-color: #e0e4eb;
+    box-shadow: 4px 4px 20px rgba(0,0,0,0.2);
+    transform: scale(1.02);
+    cursor: pointer;
+}
