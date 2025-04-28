@@ -1,23 +1,21 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
 
-# Configuração da página
-st.set_page_config(page_title="Portal de Programas", layout="centered")
+def main():
+    st.set_page_config(page_title="Portal de Programas", layout="wide")
+    st.title("🛠️ Portal de Programas")
 
-st.title("🛠️ Portal de Programas")
+    col1, col2 = st.columns(2)
 
-# Menu principal usando Tiles
-opcao = option_menu(
-    menu_title=None,
-    options=["Udemy Practice Test"],
-    icons=["book"],
-    menu_icon="cast",
-    default_index=0,
-    orientation="horizontal",
-)
+    with col1:
+        if st.button("📚 Udemy Practice Test", use_container_width=True):
+            import udemy_practice_test
+            udemy_practice_test.main()
 
-# Execução de cada programa
-if opcao == "Udemy Practice Test":
-    # Importa e executa o app do Practice Test
-    import udemy_practice_test
-    udemy_practice_test.main()
+    with col2:
+        if st.button("💰 Planejamento Financeiro", use_container_width=True):
+            import planejamento_financeiro
+            planejamento_financeiro.main()
+
+if __name__ == "__main__":
+    main()
