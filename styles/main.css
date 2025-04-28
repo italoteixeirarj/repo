@@ -1,22 +1,23 @@
 /* Estilos principais para as tiles */
-.tile {
-    background-color: #f0f2f6;
-    padding: 30px;
-    border-radius: 16px;
-    text-align: center;
-    font-size: 22px;
-    font-weight: 600;
-    box-shadow: 2px 2px 12px rgba(0,0,0,0.1);
-    transition: all 0.3s ease;
-    min-height: 180px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+button[kind="secondary"] {
+    background-color: white !important;
+    color: #333333 !important;
+    font-size: 20px !important;
+    font-weight: 600 !important;
+    padding: 30px 20px !important;
+    border: 2px solid #ddd !important;
+    border-radius: 16px !important;
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.1) !important;
+    transition: all 0.3s ease-in-out;
+    height: 200px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
 }
 
-.tile:hover {
-    background-color: #e0e4eb;
-    box-shadow: 4px 4px 20px rgba(0,0,0,0.2);
+button[kind="secondary"]:hover {
+    background-color: #f0f0f0 !important;
+    box-shadow: 4px 4px 15px rgba(0,0,0,0.15) !important;
     transform: scale(1.02);
     cursor: pointer;
 }
