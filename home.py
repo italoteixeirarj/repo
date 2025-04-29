@@ -15,6 +15,7 @@ def main():
     if page in ["udemy", "financeiro"]:
         if st.button("⬅️ Voltar ao Portal"):
             st.query_params.clear()
+            st.experimental_rerun()
 
     # Se tem parâmetro de página, carrega o app correto
     if page == "udemy":
@@ -34,10 +35,12 @@ def main():
         with col1:
             if st.button("📚 Udemy Practice Test", key="udemy_button", use_container_width=True):
                 st.query_params.update({"page": "udemy"})
+                st.experimental_rerun()
 
         with col2:
             if st.button("💰 Planejamento Financeiro", key="financeiro_button", use_container_width=True):
                 st.query_params.update({"page": "financeiro"})
+                st.experimental_rerun()
 
 if __name__ == "__main__":
     main()
