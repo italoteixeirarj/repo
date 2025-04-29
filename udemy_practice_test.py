@@ -73,9 +73,6 @@ def processar_questoes(texto):
 
     return questoes
 
-import streamlit as st
-import pandas as pd
-import io
 from openpyxl.styles import PatternFill
 from openpyxl.utils import get_column_letter
 
@@ -142,43 +139,27 @@ def processar_questoes(texto):
             opcoes.append("")
 
         questoes.append({
-            "Pergunta": pergunta,
-            "Opções": opcoes,
-            "Respostas Corretas": respostas_corretas,
+            "Questão": pergunta,
+            "Alternativa A": opcoes[0],
+            "Alternativa B": opcoes[1],
+            "Alternativa C": opcoes[2],
+            "Alternativa D": opcoes[3],
+            "Alternativa E": opcoes[4],
+            "Alternativa F": opcoes[5],
+            "Resposta Correta": ";".join([chr(65 + i) for i, r in enumerate(opcoes) if r in respostas_corretas]),
             "Explicação": explicacao.strip(),
+            "Tipo de Questão": "Múltipla Escolha" if len(respostas_corretas) == 1 else "Múltiplas Escolhas"
         })
 
     return questoes
 
 def gerar_xlsx(questoes, nome_arquivo):
     output = io.BytesIO()
-    dados = []
-
-    for questao in questoes:
-        alternativas_corretas = []
-        for idx, resposta in enumerate(questao["Opções"]):
-            if resposta in questao["Respostas Corretas"]:
-                alternativas_corretas.append(chr(65 + idx))  # A, B, C, D, E, F
-
-        dados.append({
-            "Questão": questao["Pergunta"],
-            "Alternativa A": questao["Opções"][0],
-            "Alternativa B": questao["Opções"][1],
-            "Alternativa C": questao["Opções"][2],
-            "Alternativa D": questao["Opções"][3],
-            "Alternativa E": questao["Opções"][4],
-            "Alternativa F": questao["Opções"][5],
-            "Resposta Correta": ";".join(alternativas_corretas),
-            "Explicação": questao["Explicação"],
-            "Tipo de Questão": "Múltipla Escolha" if len(alternativas_corretas) == 1 else "Múltiplas Escolhas"
-        })
-
-    df_final = pd.DataFrame(dados)
+    df_final = pd.DataFrame(questoes)
     df_final = df_final.sort_values(by="Questão").reset_index(drop=True)
 
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
         df_final.to_excel(writer, index=False, sheet_name='Questões')
-        workbook = writer.book
         worksheet = writer.sheets['Questões']
         header_fill = PatternFill(start_color="B7DEE8", end_color="B7DEE8", fill_type="solid")
         for col_num, _ in enumerate(df_final.columns, 1):
