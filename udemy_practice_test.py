@@ -88,7 +88,7 @@ def gerar_titulo_certificacao():
         if st.button("📋 Copiar Título", key="copiar_titulo"):
             st.session_state["copied_title"] = titulo_gerado
             st.write("✅ Título copiado para uso!")
-        st.components.v1.html(copy_html, height=60)
+        
     else:
         st.info("🔹 Preencha os dois campos para gerar o título.")
 
