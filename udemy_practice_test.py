@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
-import re
 import io
+import re
 from openpyxl.styles import PatternFill
 from openpyxl.utils import get_column_letter
 
@@ -64,6 +64,9 @@ def processar_questoes(texto, origem):
         if encontrou_true_false and not opcoes:
             opcoes = ["True", "False"]
 
+        if not pergunta.strip() or all(not alt.strip() for alt in opcoes):
+            continue
+
         while len(opcoes) < 5:
             opcoes.append("")
 
@@ -88,7 +91,7 @@ def processar_questoes(texto, origem):
 def gerar_xlsx(questoes, nome_arquivo):
     output = io.BytesIO()
     df_final = pd.DataFrame(questoes)
-    df_final = df_final.sort_values(by="Questão").reset_index(drop=True)
+    df_final = df_final.sort_values(by="Pergunta").reset_index(drop=True)
 
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
         df_final.to_excel(writer, index=False, sheet_name='Questões')
@@ -106,8 +109,6 @@ def gerar_xlsx(questoes, nome_arquivo):
         file_name=f"{nome_arquivo}.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
-
-# (As funções gerar_csv_udemy, agregar_planilhas e main permanecem como estavam, sem alterações)
 
 
 def gerar_csv_udemy(questoes, nome_arquivo):
