@@ -63,6 +63,9 @@ def processar_questoes(texto):
         if encontrou_true_false and not opcoes:
             opcoes = ["True", "False"]
 
+        if not pergunta.strip() or all(not alt.strip() for alt in opcoes):
+            continue  # Ignora blocos inválidos ou vazios
+
         while len(opcoes) < 6:
             opcoes.append("")
 
