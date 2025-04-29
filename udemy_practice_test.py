@@ -82,9 +82,9 @@ def gerar_titulo_certificacao():
     if nome_cert and cod_cert:
         titulo_gerado = f"[{ano_atual}] {nome_cert.strip()} [{cod_cert.strip()}]"
         st.code(titulo_gerado, language="")
-        st.button("📋 Copiar Título", on_click=st.session_state.update, kwargs={"copied_title": titulo_gerado})
-        st.code(titulo_gerado, language="", line_numbers=False)
-        st.button("📋 Copiar Título", on_click=st.session_state.update, kwargs={"copy": titulo_gerado})
+        if st.button("📋 Copiar Título", key="copiar_titulo"):
+            st.session_state["copied_title"] = titulo_gerado
+            st.success("Título copiado para uso!")
     else:
         st.info("🔹 Preencha os dois campos para gerar o título.")
 
