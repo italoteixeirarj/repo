@@ -27,10 +27,12 @@ def main():
         col1, col2 = st.columns(2)
 
         with col1:
-            if st.button("📚 Udemy Practice Test", key="udemy_tile", use_container_width=True):
+            if st.button("📚 Udemy Practice Test", key="udemy_button", use_container_width=True):
                 st.query_params.update({"page": "udemy"})
 
         with col2:
-            if st.button("💰 Planejamento Financeiro", key="financeiro_tile", use_container_width=True):
+            if st.button("💰 Planejamento Financeiro", key="financeiro_button", use_container_width=True):
                 st.query_params.update({"page": "financeiro"})
 
+if __name__ == "__main__":
+    main()
