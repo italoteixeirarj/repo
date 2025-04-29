@@ -2,8 +2,20 @@ import streamlit as st
 import pandas as pd
 import io
 import re
+import csv
 from openpyxl.styles import PatternFill
 from openpyxl.utils import get_column_letter
+
+CSV_HEADER = [
+    "Question", "Question Type",
+    "Answer Option 1", "Explanation 1",
+    "Answer Option 2", "Explanation 2",
+    "Answer Option 3", "Explanation 3",
+    "Answer Option 4", "Explanation 4",
+    "Answer Option 5", "Explanation 5",
+    "Answer Option 6", "Explanation 6",
+    "Correct Answers", "Overall Explanation", "Domain"
+]
 
 def processar_questoes(texto, origem):
     questoes = []
@@ -110,17 +122,6 @@ def gerar_xlsx(questoes, nome_arquivo):
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
 
-CSV_HEADER = [
-    "Question", "Question Type",
-    "Answer Option 1", "Explanation 1",
-    "Answer Option 2", "Explanation 2",
-    "Answer Option 3", "Explanation 3",
-    "Answer Option 4", "Explanation 4",
-    "Answer Option 5", "Explanation 5",
-    "Answer Option 6", "Explanation 6",
-    "Correct Answers", "Overall Explanation", "Domain"
-]
-
 def gerar_csv_udemy(texto, nome_arquivo):
     output = io.StringIO()
     questions = []
@@ -186,75 +187,3 @@ def gerar_csv_udemy(texto, nome_arquivo):
         file_name=f"{nome_arquivo}.csv",
         mime="text/csv"
     )
-
-def agregar_planilhas(files, formato, nome_arquivo):
-    if formato == "XLSX (Organizado)":
-        dfs = [pd.read_excel(file) for file in files]
-        resultado = pd.concat(dfs, ignore_index=True)
-        output = io.BytesIO()
-        with pd.ExcelWriter(output, engine='openpyxl') as writer:
-            resultado.to_excel(writer, index=False)
-        st.download_button(
-            label="📥 Baixar Planilha Agregada (XLSX)",
-            data=output.getvalue(),
-            file_name=f"{nome_arquivo}_agregado.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
-    else:
-        dfs = [pd.read_csv(file) for file in files]
-        resultado = pd.concat(dfs, ignore_index=True)
-        output = io.StringIO()
-        resultado.to_csv(output, index=False, encoding='utf-8-sig')
-        st.download_button(
-            label="📥 Baixar Planilha Agregada (CSV)",
-            data=output.getvalue(),
-            file_name=f"{nome_arquivo}_agregado.csv",
-            mime="text/csv"
-        )
-
-def main():
-    st.title("📚 Udemy Practice Test Manager")
-
-    escolha = st.session_state.get("escolha", "Gerar Nova Planilha")
-
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("📝 Gerar Nova Planilha"):
-            st.session_state["escolha"] = "Gerar Nova Planilha"
-    with col2:
-        if st.button("➕ Agregar Planilhas"):
-            st.session_state["escolha"] = "Agregar Planilhas"
-
-    escolha = st.session_state.get("escolha", "Gerar Nova Planilha")
-
-    if escolha == "Gerar Nova Planilha":
-        nome_arquivo = st.text_input("Nome do Practice Test (sem espaços):")
-        texto = st.text_area("Cole o conteúdo das questões:")
-        formato = st.radio("Escolha o formato de exportação:", ("XLSX (Organizado)", "CSV (Importação Udemy)"))
-
-        if st.button("Gerar Arquivo"):
-            if not texto or not nome_arquivo:
-                st.warning("⚠️ Por favor, preencha todos os campos.")
-                return
-
-            questoes = processar_questoes(texto, nome_arquivo)
-
-            if formato == "XLSX (Organizado)":
-                gerar_xlsx(questoes, nome_arquivo)
-            else:
-                gerar_csv_udemy(questoes, nome_arquivo)
-
-    elif escolha == "Agregar Planilhas":
-        nome_arquivo = st.text_input("Nome do arquivo final (sem espaços):")
-        formato = st.radio("Escolha o formato das planilhas a agregar:", ("XLSX (Organizado)", "CSV (Importação Udemy)"))
-        files = st.file_uploader("Envie os arquivos para agregar", type=["xlsx", "csv"], accept_multiple_files=True)
-
-        if st.button("Gerar Planilha Agregada"):
-            if not files or not nome_arquivo:
-                st.warning("⚠️ Por favor, envie os arquivos e defina o nome final.")
-                return
-            agregar_planilhas(files, formato, nome_arquivo)
-
-if __name__ == "__main__":
-    main()
-#
