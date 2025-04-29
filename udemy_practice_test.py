@@ -81,13 +81,14 @@ def gerar_titulo_certificacao():
 
     if nome_cert and cod_cert:
         titulo_gerado = f"[{ano_atual}] {nome_cert.strip()} [{cod_cert.strip()}]"
-        st.code(titulo_gerado, language="")
 
-        copy_script = f"""
-            <input type='text' value='{titulo_gerado}' id='titulo_curso' readonly style='opacity:0; position:absolute; z-index:-1;'>
-            <button onclick=\"navigator.clipboard.writeText(document.getElementById('titulo_curso').value)\">📋 Copiar Título</button>
+        copy_html = f"""
+            <div style='position: relative;'>
+                <input type='text' value='{titulo_gerado}' id='titulo_curso' readonly style='width: 100%; padding: 8px; font-size: 16px;' onclick='navigator.clipboard.writeText(this.value)'>
+                <div style='position: absolute; top: 0; right: 10px; height: 100%; display: flex; align-items: center; font-size: 12px; color: #888;'>Clique para copiar</div>
+            </div>
         """
-        st.components.v1.html(copy_script, height=50)
+        st.components.v1.html(copy_html, height=60)
     else:
         st.info("🔹 Preencha os dois campos para gerar o título.")
 
