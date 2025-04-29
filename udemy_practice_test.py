@@ -110,38 +110,76 @@ def gerar_xlsx(questoes, nome_arquivo):
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
 
+CSV_HEADER = [
+    "Question", "Question Type",
+    "Answer Option 1", "Explanation 1",
+    "Answer Option 2", "Explanation 2",
+    "Answer Option 3", "Explanation 3",
+    "Answer Option 4", "Explanation 4",
+    "Answer Option 5", "Explanation 5",
+    "Answer Option 6", "Explanation 6",
+    "Correct Answers", "Overall Explanation", "Domain"
+]
 
-def gerar_csv_udemy(questoes, nome_arquivo):
+def gerar_csv_udemy(texto, nome_arquivo):
     output = io.StringIO()
-    csv_data = []
-    for questao in questoes:
-        alternativas_corretas = []
-        for idx, resposta in enumerate(questao["Opções"]):
-            if resposta in questao["Respostas Corretas"]:
-                alternativas_corretas.append(str(idx + 1))
+    questions = []
 
-        csv_data.append({
-            "Question": questao["Pergunta"],
-            "Question Type": "multiple-choice" if len(alternativas_corretas) == 1 else "multi-select",
-            "Answer Option 1": questao["Opções"][0],
-            "Answer Option 2": questao["Opções"][1],
-            "Answer Option 3": questao["Opções"][2],
-            "Answer Option 4": questao["Opções"][3],
-            "Answer Option 5": questao["Opções"][4],
-            "Answer Option 6": questao["Opções"][5],
-            "Explanation 1": "",
-            "Explanation 2": "",
-            "Explanation 3": "",
-            "Explanation 4": "",
-            "Explanation 5": "",
-            "Explanation 6": "",
-            "Correct Answers": ";".join(alternativas_corretas),
-            "Overall Explanation": questao["Explicação"],
+    blocks = re.split(r"(?=Question \d+\n)", texto.strip())
+
+    for block in blocks:
+        lines = block.strip().splitlines()
+        if not lines or not lines[0].startswith("Question"):
+            continue
+
+        question_text = ""
+        answers = []
+        correct_indexes = []
+        in_question = False
+
+        for i, line in enumerate(lines):
+            line = line.strip()
+
+            if re.match(r"^Question \d+", line):
+                in_question = True
+                continue
+
+            if in_question and not question_text and line and line.upper() != "SKIPPED":
+                question_text = line
+                continue
+
+            if "Correct answer" in line or "Correct selection" in line:
+                if i + 1 < len(lines):
+                    answer_text = lines[i + 1].strip()
+                    if answer_text not in answers:
+                        answers.append(answer_text)
+                    correct_indexes.append(answers.index(answer_text) + 1)
+            elif line and not line.startswith("Overall explanation") and not line.startswith("Skipped") and not any(kw in line for kw in ["Correct answer", "Correct selection"]):
+                if line not in answers:
+                    answers.append(line)
+
+        question_type = "multi-select" if len(correct_indexes) > 1 else "multiple-choice"
+
+        qdata = {
+            "Question": question_text,
+            "Question Type": question_type,
+            "Correct Answers": ",".join(map(str, correct_indexes)),
+            "Overall Explanation": "",
             "Domain": ""
-        })
+        }
 
-    df_csv = pd.DataFrame(csv_data)
-    df_csv.to_csv(output, index=False, encoding='utf-8-sig')
+        for i in range(6):
+            qdata[f"Answer Option {i+1}"] = answers[i] if i < len(answers) else ""
+            qdata[f"Explanation {i+1}"] = ""
+
+        questions.append(qdata)
+
+    df_csv = pd.DataFrame(questions, columns=CSV_HEADER)
+
+    df_csv.to_csv(output, index=False)
+
+    st.success(f"✅ {len(df_csv)} questões processadas para CSV!")
+
     st.download_button(
         label="📥 Baixar CSV para Udemy",
         data=output.getvalue(),
