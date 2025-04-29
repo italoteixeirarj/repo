@@ -1,101 +1,158 @@
-import csv
-import re
-from typing import List
 import pandas as pd
+import re
+import os
 
-CSV_HEADER = [
-    "Question", "Question Type",
-    "Answer Option 1", "Explanation 1",
-    "Answer Option 2", "Explanation 2",
-    "Answer Option 3", "Explanation 3",
-    "Answer Option 4", "Explanation 4",
-    "Answer Option 5", "Explanation 5",
-    "Answer Option 6", "Explanation 6",
-    "Correct Answers", "Overall Explanation", "Domain"
-]
 
-def parse_questions(raw_text: str) -> List[dict]:
-    blocks = re.split(r"(?=Question \d+\n)", raw_text.strip())
-    questions = []
+def ler_input():
+    print("\nCole abaixo TODO o conteúdo das questões.")
+    print("Quando terminar, digite FIM sozinho na linha e pressione Enter:")
+    linhas = []
+    while True:
+        linha = input()
+        if linha.strip().upper() == "FIM":
+            break
+        linhas.append(linha)
+    return "\n".join(linhas)
 
-    for block in blocks:
-        lines = block.strip().splitlines()
-        if not lines or not lines[0].startswith("Question"):
+
+def processar_questoes(texto, origem):
+    questoes = []
+    blocos = re.split(r'Question \d+', texto)
+
+    for bloco in blocos:
+        bloco = bloco.strip()
+        if not bloco:
             continue
 
-        question_text = ""
-        answers = []
-        correct_indexes = []
-        in_question = False
+        linhas = bloco.split("\n")
+        pergunta = ""
+        opcoes = []
+        respostas_corretas = []
+        explicacao = ""
+        captura_explicacao = False
+        encontrou_true_false = False
 
-        for i, line in enumerate(lines):
-            line = line.strip()
+        for i, linha in enumerate(linhas):
+            linha = linha.strip()
 
-            if re.match(r"^Question \d+", line):
-                in_question = True
+            if i == 0 and linha.lower() == 'skipped':
                 continue
 
-            if in_question and not question_text and line and line.upper() != "SKIPPED":
-                question_text = line
+            if i == 1 and linha != '':
+                pergunta = linha
                 continue
 
-            if "Correct answer" in line or "Correct selection" in line:
-                if i + 1 < len(lines):
-                    answer_text = lines[i + 1].strip()
-                    if answer_text not in answers:
-                        answers.append(answer_text)
-                    correct_indexes.append(answers.index(answer_text) + 1)
-            elif line and not line.startswith("Overall explanation") and not line.startswith("Skipped") and not any(kw in line for kw in ["Correct answer", "Correct selection"]):
-                if line not in answers:
-                    answers.append(line)
+            if linha.lower() in [
+                'choose the correct answer.',
+                'there are two correct answers.',
+                'there are three correct answers.',
+                'there are four correct answers.',
+                'there are five correct answers.'
+            ]:
+                continue
 
-        question_type = "multi-select" if len(correct_indexes) > 1 else "multiple-choice"
+            if linha.lower().startswith('correct answer') or linha.lower().startswith('correct selection'):
+                try:
+                    resposta = linhas[i+1].strip()
+                    if resposta:
+                        respostas_corretas.append(resposta)
+                except:
+                    pass
 
-        qdata = {
-            "Question": question_text,
-            "Question Type": question_type,
-            "Correct Answers": ",".join(map(str, correct_indexes)),
-            "Overall Explanation": "",
-            "Domain": ""
-        }
+            elif linha.lower().startswith('overall explanation'):
+                captura_explicacao = True
 
-        for i in range(6):
-            qdata[f"Answer Option {i+1}"] = answers[i] if i < len(answers) else ""
-            qdata[f"Explanation {i+1}"] = ""
+            elif captura_explicacao:
+                explicacao += linha + " "
 
-        questions.append(qdata)
+            else:
+                if linha and not linha.lower().startswith('note') and not linha.lower().startswith('skipped'):
+                    if linha.lower() in ['true', 'false']:
+                        encontrou_true_false = True
+                    opcoes.append(linha)
 
-    return questions
+        if encontrou_true_false and not opcoes:
+            opcoes = ["True", "False"]
 
-def write_csv(questions: List[dict], output_file: str):
-    with open(output_file, mode="w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=CSV_HEADER)
-        writer.writeheader()
-        writer.writerows(questions)
+        while len(opcoes) < 5:
+            opcoes.append("")
+
+        pergunta_formatada = pergunta
+        if len(respostas_corretas) > 1:
+            pergunta_formatada += f" ({len(respostas_corretas)} correct)"
+
+        questoes.append({
+            "Pergunta": pergunta_formatada,
+            "Opção A": opcoes[0],
+            "Opção B": opcoes[1],
+            "Opção C": opcoes[2],
+            "Opção D": opcoes[3],
+            "Opção E": opcoes[4],
+            "Resposta(s) Correta(s)": "; ".join(respostas_corretas),
+            "Explicação": explicacao.strip(),
+            "Origem": origem
+        })
+
+    return questoes
+
+
+def salvar_excel(questoes, nome_arquivo):
+    df = pd.DataFrame(questoes)
+    df.to_excel(nome_arquivo, index=False)
+    print(f"\n✅ Arquivo '{nome_arquivo}' gerado com sucesso!")
+    print(f"📊 Total de questões processadas: {len(questoes)}")
+
+
+def agregar_planilhas():
+    quantidade = int(input("Quantas planilhas você deseja agregar? "))
+    arquivos = []
+    for i in range(quantidade):
+        nome = input(f"Digite o nome da planilha {i+1} (ex: planilha.xlsx): ").strip()
+        if not os.path.exists(nome):
+            print(f"\n🚫 Arquivo '{nome}' não encontrado! Abortando.")
+            return
+        arquivos.append(nome)
+
+    frames = []
+    for arquivo in arquivos:
+        df = pd.read_excel(arquivo)
+        frames.append(df)
+
+    df_final = pd.concat(frames, ignore_index=True)
+
+    nome_saida = input("Digite o nome do novo arquivo final (ex: todas_questoes.xlsx): ").strip()
+    if not nome_saida.endswith('.xlsx'):
+        nome_saida += '.xlsx'
+
+    df_final.to_excel(nome_saida, index=False)
+    print(f"\n✅ Arquivo agregado '{nome_saida}' gerado com sucesso!")
+    print(f"📊 Total de questões agregadas: {len(df_final)}")
+
+
+def gerar_nome_arquivo(origem):
+    nome = origem.lower().replace("practice test", "practice").replace(" ", "") + ".xlsx"
+    return nome
+
+
+def menu_principal():
+    print("\n=== Gerenciador de Questões Udemy ===")
+    print("1 - Gerar nova planilha")
+    print("2 - Agregar planilhas existentes")
+    opcao = input("Escolha uma opção (1 ou 2): ").strip()
+
+    if opcao == '1':
+        origem = input("Digite de qual Practice Test essas questões pertencem (ex: Practice Test 1): ").strip()
+        texto = ler_input()
+        questoes = processar_questoes(texto, origem)
+        nome_arquivo = gerar_nome_arquivo(origem)
+        salvar_excel(questoes, nome_arquivo)
+
+    elif opcao == '2':
+        agregar_planilhas()
+
+    else:
+        print("\nOpção inválida! Tente novamente.")
+
 
 if __name__ == "__main__":
-    print("Cole abaixo as questões no formato original (digite 'FIM' em uma nova linha para encerrar):")
-    user_lines = []
-    while True:
-        line = input()
-        if line.strip().upper() == "FIM":
-            break
-        user_lines.append(line)
-
-    raw_data = "\n".join(user_lines)
-    parsed_questions = parse_questions(raw_data)
-
-    # Criar DataFrame com todas as colunas do template Udemy
-    df_full = pd.DataFrame(parsed_questions, columns=CSV_HEADER)
-
-    # Visualizar conteúdo organizado
-    print("\nPré-visualização do conteúdo a ser salvo no CSV:")
-    display_cols = ["Question", "Question Type", "Correct Answers"] + [f"Answer Option {i+1}" for i in range(6)]
-    print(df_full[display_cols].to_string(index=False))
-
-    confirm = input("\nDeseja salvar o arquivo CSV? (s/n): ").strip().lower()
-    if confirm == 's':
-        write_csv(parsed_questions, "simulado_gerado_udemy.csv")
-        print(f"\n{len(parsed_questions)} questões processadas com sucesso. Arquivo: simulado_gerado_udemy.csv")
-    else:
-        print("\nOperação cancelada. O arquivo CSV não foi salvo.")
+    menu_principal()
