@@ -73,6 +73,83 @@ def processar_questoes(texto):
 
     return questoes
 
+import streamlit as st
+import pandas as pd
+import io
+from openpyxl.styles import PatternFill
+from openpyxl.utils import get_column_letter
+
+def processar_questoes(texto):
+    questoes = []
+    blocos = texto.split('Question')
+
+    for bloco in blocos:
+        bloco = bloco.strip()
+        if not bloco:
+            continue
+
+        linhas = bloco.split("\n")
+        pergunta = ""
+        opcoes = []
+        respostas_corretas = []
+        explicacao = ""
+        captura_explicacao = False
+        encontrou_true_false = False
+
+        for i, linha in enumerate(linhas):
+            linha = linha.strip()
+
+            if i == 0 and linha.lower() == 'skipped':
+                continue
+
+            if i == 1 and linha != '':
+                pergunta = linha
+                continue
+
+            if linha.lower() in [
+                'choose the correct answer.',
+                'there are two correct answers.',
+                'there are three correct answers.',
+                'there are four correct answers.',
+                'there are five correct answers.'
+            ]:
+                continue
+
+            if linha.lower().startswith('correct answer') or linha.lower().startswith('correct selection'):
+                try:
+                    resposta = linhas[i+1].strip()
+                    if resposta:
+                        respostas_corretas.append(resposta)
+                except:
+                    pass
+
+            elif linha.lower().startswith('overall explanation'):
+                captura_explicacao = True
+
+            elif captura_explicacao:
+                explicacao += linha + " "
+
+            else:
+                if linha and not linha.lower().startswith('note') and not linha.lower().startswith('skipped'):
+                    if linha.lower() in ['true', 'false']:
+                        encontrou_true_false = True
+                    opcoes.append(linha)
+
+        if encontrou_true_false and not opcoes:
+            opcoes = ["True", "False"]
+
+        while len(opcoes) < 6:
+            opcoes.append("")
+
+        questoes.append({
+            "Pergunta": pergunta,
+            "Opções": opcoes,
+            "Respostas Corretas": respostas_corretas,
+            "Explicação": explicacao.strip(),
+        })
+
+    return questoes
+
 def gerar_xlsx(questoes, nome_arquivo):
     output = io.BytesIO()
     dados = []
@@ -84,8 +161,7 @@ def gerar_xlsx(questoes, nome_arquivo):
                 alternativas_corretas.append(chr(65 + idx))  # A, B, C, D, E, F
 
         dados.append({
-            "Pergunta": questao["Pergunta"],
-            "Tipo de Questão": "Múltipla Escolha" if len(alternativas_corretas) == 1 else "Múltiplas Escolhas",
+            "Questão": questao["Pergunta"],
             "Alternativa A": questao["Opções"][0],
             "Alternativa B": questao["Opções"][1],
             "Alternativa C": questao["Opções"][2],
@@ -93,12 +169,23 @@ def gerar_xlsx(questoes, nome_arquivo):
             "Alternativa E": questao["Opções"][4],
             "Alternativa F": questao["Opções"][5],
             "Resposta Correta": ";".join(alternativas_corretas),
-            "Explicação": questao["Explicação"]
+            "Explicação": questao["Explicação"],
+            "Tipo de Questão": "Múltipla Escolha" if len(alternativas_corretas) == 1 else "Múltiplas Escolhas"
         })
 
     df_final = pd.DataFrame(dados)
+    df_final = df_final.sort_values(by="Questão").reset_index(drop=True)
+
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
-        df_final.to_excel(writer, index=False)
+        df_final.to_excel(writer, index=False, sheet_name='Questões')
+        workbook = writer.book
+        worksheet = writer.sheets['Questões']
+        header_fill = PatternFill(start_color="B7DEE8", end_color="B7DEE8", fill_type="solid")
+        for col_num, _ in enumerate(df_final.columns, 1):
+            col_letter = get_column_letter(col_num)
+            worksheet[f"{col_letter}1"].fill = header_fill
+
+    st.success(f"✅ {len(df_final)} questões geradas com sucesso!")
 
     st.download_button(
         label="📥 Baixar XLSX",
@@ -106,6 +193,9 @@ def gerar_xlsx(questoes, nome_arquivo):
         file_name=f"{nome_arquivo}.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
+
+# (As funções gerar_csv_udemy, agregar_planilhas e main permanecem como estavam, sem alterações)
+
 
 def gerar_csv_udemy(questoes, nome_arquivo):
     output = io.StringIO()
