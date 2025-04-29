@@ -98,8 +98,8 @@ def gerar_titulo_certificacao():
 
             <script>
             function copyToClipboard(el) {
-                el.select();
-                document.execCommand('copy');
+            el.select();
+            document.execCommand('copy');
             }
             </script>
         """
