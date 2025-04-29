@@ -90,6 +90,73 @@ def gerar_titulo_certificacao():
     else:
         st.info("🔹 Preencha os dois campos para gerar o título.")
 
+# === FUNCIONALIDADE: Gerar Título do Curso ===
+
+def gerar_intended_learners():
+    st.subheader("🧠 Gerar Intended Learners")
+
+    nome_cert = st.text_input("Nome da Certificação", key="nome_cert_learners")
+    cod_cert = st.text_input("Código da Certificação", key="cod_cert_learners")
+
+    if nome_cert and cod_cert:
+        area = "aws" if "aws" in nome_cert.lower() else "sap" if "sap" in nome_cert.lower() else "geral"
+
+        if area == "aws":
+            aprendizados = [
+                "EXAM SIMULATION: All practice tests are timed and scored (passing score is 72%) mimicking the real exam.",
+                "ASSESS YOUR EXAM READINESS: Pass the exam with a great score.",
+                "DETAILED EXPLANATIONS: Every question includes a detailed explanation.",
+                "RANDOMIZED QUESTIONS: The questions and answers are randomized to ensure challenge.",
+                "ALWAYS UP TO DATE: Content is constantly updated based on real exam feedback.",
+                "REFERENCE LINKS: Help you understand AWS concepts."
+            ]
+            requisitos = [
+                f"Students are required to have successfully passed the {nome_cert} exam.",
+                f"Before assessing readiness, it's recommended to complete {nome_cert} documentation or course."
+            ]
+            publico = [
+                f"Candidates for the {nome_cert} exam who want to pass on their first attempt.",
+                "Students preparing for the exam who want to pass with confidence.",
+                "IT Professionals entering AWS technical job interviews.",
+                "Anyone who wants to test their skills in exam simulation."
+            ]
+
+        elif area == "sap":
+            aprendizados = [
+                "Practice Test 1 (30 questions)",
+                "Practice Test 2 (30 questions)",
+                "Practice Test 3 (30 questions)",
+                "Practice Test 4 (30 questions)",
+                "Practice Test 5 (35 questions)",
+                "Practice Test Bonus (53 questions)"
+            ]
+            requisitos = ["SAP Basis"]
+            publico = [
+                "SAP Basis consultants",
+                "SAP HANA Consultants",
+                "Database Administrators for SAP HANA",
+                "SAP Consultants"
+            ]
+
+        else:
+            aprendizados = ["General practice test with varied questions and detailed feedback."]
+            requisitos = ["No prerequisites. This course is accessible to all learners."]
+            publico = ["Beginners and professionals seeking exam readiness."]
+
+        st.markdown("---")
+        st.markdown("**✅ O que os alunos aprenderão:**")
+        for item in aprendizados:
+            st.markdown(f"- {item}")
+
+        st.markdown("**📌 Requisitos ou pré-requisitos:**")
+        for item in requisitos:
+            st.markdown(f"- {item}")
+
+        st.markdown("**🎯 Público-alvo:**")
+        for item in publico:
+            st.markdown(f"- {item}")
+    else:
+        st.info("🔹 Preencha os campos para gerar as sugestões.")
 
 # === FUNÇÕES EXISTENTES ===
 
