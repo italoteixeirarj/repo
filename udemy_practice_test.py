@@ -85,19 +85,33 @@ def gerar_titulo_certificacao():
         st.markdown("**Título do Curso:**")
 
         copy_html = f"""
-            <div style='position: relative;'>
-                <input type='text' value='{titulo_gerado}' id='titulo_curso' readonly
-                    style='width: 100%; padding: 8px; font-size: 16px; border: 1px solid #ccc; border-radius: 6px;'
-                    onclick='navigator.clipboard.writeText(this.value)'>
-
-                <div style='position: absolute; top: 0; right: 10px; height: 100%;
-                    display: flex; align-items: center; font-size: 12px; color: #888; font-style: italic;'>
+            <div style="position: relative; width: 100%;">
+                <input type="text" id="titulo_curso" value="{titulo_gerado}" readonly
+                    style="
+                        width: 100%;
+                        padding: 0.5rem 0.75rem;
+                        font-size: 1rem;
+                        border: 1px solid rgba(49, 51, 63, 0.2);
+                        border-radius: 0.5rem;
+                        background-color: #f9f9f9;
+                        font-family: inherit;
+                    "
+                    onclick="navigator.clipboard.writeText(this.value)">
+                <div style="
+                        position: absolute;
+                        top: 50%;
+                        right: 1rem;
+                        transform: translateY(-50%);
+                        font-size: 0.75rem;
+                        color: gray;
+                        font-style: italic;
+                    ">
                     Clique para copiar
                 </div>
             </div>
         """
 
-        st.components.v1.html(copy_html, height=60)
+        st.components.v1.html(copy_html, height=70)
     else:
         st.info("🔹 Preencha os dois campos para gerar o título.")
 
