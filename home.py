@@ -12,20 +12,19 @@ def main():
     col1, col2 = st.columns(2)
 
     with col1:
-        if st.markdown("<div class='tile' onclick=\"window.location.href='?page=udemy'\">📚 Udemy Practice Test</div>", unsafe_allow_html=True):
-            pass
+        st.markdown("<div class='tile' onclick=\"window.location.search='?page=udemy'\">📚 Udemy Practice Test</div>", unsafe_allow_html=True)
 
     with col2:
-        if st.markdown("<div class='tile' onclick=\"window.location.href='?page=financeiro'\">💰 Planejamento Financeiro</div>", unsafe_allow_html=True):
-            pass
+        st.markdown("<div class='tile' onclick=\"window.location.search='?page=financeiro'\">💰 Planejamento Financeiro</div>", unsafe_allow_html=True)
 
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # Controle de navegação simulada
-    if st.query_params().get("page") == ["udemy"]:
+    # Controle de navegação
+    page = st.query_params.get("page")
+    if page == "udemy":
         import udemy_practice_test
         udemy_practice_test.main()
-    elif st.query_params().get("page") == ["financeiro"]:
+    elif page == "financeiro":
         import planejamento_financeiro
         planejamento_financeiro.main()
 
