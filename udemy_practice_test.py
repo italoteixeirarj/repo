@@ -82,6 +82,8 @@ def gerar_titulo_certificacao():
     if nome_cert and cod_cert:
         titulo_gerado = f"[{ano_atual}] {nome_cert.strip()} [{cod_cert.strip()}]"
 
+        st.markdown("**Título do Curso:**")
+
         copy_html = f"""
             <div style='position: relative;'>
                 <input type='text' value='{titulo_gerado}' id='titulo_curso' readonly style='width: 100%; padding: 8px; font-size: 16px;' onclick='navigator.clipboard.writeText(this.value)'>
