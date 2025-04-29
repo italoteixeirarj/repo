@@ -25,3 +25,27 @@
     box-shadow: 4px 4px 15px rgba(0,0,0,0.2);
     transform: scale(1.02);
 }
+
+/* Estilo para o campo de cópia do título */
+#titulo_curso {
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 10px;
+    font-size: 16px;
+    font-family: inherit;
+    background-color: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  .copy-tooltip {
+    position: absolute;
+    top: 0;
+    right: 12px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    color: #888;
+    font-style: italic;
+  }
+  
