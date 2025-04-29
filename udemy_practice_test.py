@@ -85,9 +85,7 @@ def gerar_titulo_certificacao():
         st.markdown("**Título do Curso:**")
 
         st.code(titulo_gerado, language="")
-        if st.button("📋 Copiar Título", key="copiar_titulo"):
-            st.session_state["copied_title"] = titulo_gerado
-            st.write("✅ Título copiado para uso!")
+        st.markdown("<div style='text-align: right; font-size: 0.75rem; color: gray; font-style: italic;'>Clique para copiar</div>", unsafe_allow_html=True)
         
     else:
         st.info("🔹 Preencha os dois campos para gerar o título.")
