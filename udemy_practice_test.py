@@ -86,14 +86,26 @@ def gerar_titulo_certificacao():
 
         copy_html = f"""
             <div style='position: relative;'>
-                <input type='text' value='{titulo_gerado}' id='titulo_curso' readonly style='width: 100%; padding: 8px; font-size: 16px;' onclick='navigator.clipboard.writeText(this.value)'>
-                <div style='position: absolute; top: 0; right: 10px; height: 100%; display: flex; align-items: center; font-size: 12px; color: #888;'>Clique para copiar</div>
+                <input type='text' value='{titulo_gerado}' id='titulo_curso' readonly
+                    style='width: 100%; padding: 8px; font-size: 16px; border: 1px solid #ccc; border-radius: 6px;'
+                    onclick='copyToClipboard(this)'>
+
+                <div style='position: absolute; top: 0; right: 10px; height: 100%;
+                    display: flex; align-items: center; font-size: 12px; color: #888; font-style: italic;'>
+                    Clique para copiar
+                </div>
             </div>
+
+            <script>
+            function copyToClipboard(el) {
+                el.select();
+                document.execCommand('copy');
+            }
+            </script>
         """
         st.components.v1.html(copy_html, height=60)
     else:
         st.info("🔹 Preencha os dois campos para gerar o título.")
-
 
 # === FUNÇÕES EXISTENTES ===
 
