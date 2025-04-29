@@ -145,13 +145,16 @@ def gerar_intended_learners():
 
         st.markdown("---")
         st.markdown("**✅ O que os alunos aprenderão:**")
-        st.code("\n".join(f"- {a}" for a in aprendizados), language="markdown")
+        for i, a in enumerate(aprendizados):
+            st.code(a, language="", key=f"aprendizado_{i}")
 
         st.markdown("**📌 Requisitos ou pré-requisitos:**")
-        st.code("\n".join(f"- {r}" for r in requisitos), language="markdown")
+        for i, r in enumerate(requisitos):
+            st.code(r, language="", key=f"requisito_{i}")
 
         st.markdown("**🎯 Público-alvo:**")
-        st.code("\n".join(f"- {p}" for p in publico), language="markdown")
+        for i, p in enumerate(publico):
+            st.code(p, language="", key=f"publico_{i}")
 
     else:
         st.info("🔹 Preencha os campos para gerar as sugestões.")
