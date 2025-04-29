@@ -1,5 +1,3 @@
-# Programa: Gerador de CSV para Udemy a partir de perguntas coladas em texto (via input)
-
 import csv
 import re
 from typing import List
