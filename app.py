@@ -1,19 +1,21 @@
+import streamlit as st
 import pandas as pd
+import io
 import re
-import os
+import csv
+from openpyxl.styles import PatternFill
+from openpyxl.utils import get_column_letter
 
-
-def ler_input():
-    print("\nCole abaixo TODO o conteúdo das questões.")
-    print("Quando terminar, digite FIM sozinho na linha e pressione Enter:")
-    linhas = []
-    while True:
-        linha = input()
-        if linha.strip().upper() == "FIM":
-            break
-        linhas.append(linha)
-    return "\n".join(linhas)
-
+CSV_HEADER = [
+    "Question", "Question Type",
+    "Answer Option 1", "Explanation 1",
+    "Answer Option 2", "Explanation 2",
+    "Answer Option 3", "Explanation 3",
+    "Answer Option 4", "Explanation 4",
+    "Answer Option 5", "Explanation 5",
+    "Answer Option 6", "Explanation 6",
+    "Correct Answers", "Overall Explanation", "Domain"
+]
 
 def processar_questoes(texto, origem):
     questoes = []
@@ -74,6 +76,9 @@ def processar_questoes(texto, origem):
         if encontrou_true_false and not opcoes:
             opcoes = ["True", "False"]
 
+        if not pergunta.strip() or all(not alt.strip() for alt in opcoes):
+            continue
+
         while len(opcoes) < 5:
             opcoes.append("")
 
@@ -95,64 +100,90 @@ def processar_questoes(texto, origem):
 
     return questoes
 
+def gerar_xlsx(questoes, nome_arquivo):
+    output = io.BytesIO()
+    df_final = pd.DataFrame(questoes)
+    df_final = df_final.sort_values(by="Pergunta").reset_index(drop=True)
 
-def salvar_excel(questoes, nome_arquivo):
-    df = pd.DataFrame(questoes)
-    df.to_excel(nome_arquivo, index=False)
-    print(f"\n✅ Arquivo '{nome_arquivo}' gerado com sucesso!")
-    print(f"📊 Total de questões processadas: {len(questoes)}")
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df_final.to_excel(writer, index=False, sheet_name='Questões')
+        worksheet = writer.sheets['Questões']
+        header_fill = PatternFill(start_color="B7DEE8", end_color="B7DEE8", fill_type="solid")
+        for col_num, _ in enumerate(df_final.columns, 1):
+            col_letter = get_column_letter(col_num)
+            worksheet[f"{col_letter}1"].fill = header_fill
 
+    st.success(f"✅ {len(df_final)} questões geradas com sucesso!")
 
-def agregar_planilhas():
-    quantidade = int(input("Quantas planilhas você deseja agregar? "))
-    arquivos = []
-    for i in range(quantidade):
-        nome = input(f"Digite o nome da planilha {i+1} (ex: planilha.xlsx): ").strip()
-        if not os.path.exists(nome):
-            print(f"\n🚫 Arquivo '{nome}' não encontrado! Abortando.")
-            return
-        arquivos.append(nome)
+    st.download_button(
+        label="📥 Baixar XLSX",
+        data=output.getvalue(),
+        file_name=f"{nome_arquivo}.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
 
-    frames = []
-    for arquivo in arquivos:
-        df = pd.read_excel(arquivo)
-        frames.append(df)
+def gerar_csv_udemy(texto, nome_arquivo):
+    output = io.StringIO()
+    questions = []
 
-    df_final = pd.concat(frames, ignore_index=True)
+    blocks = re.split(r"(?=Question \d+\n)", texto.strip())
 
-    nome_saida = input("Digite o nome do novo arquivo final (ex: todas_questoes.xlsx): ").strip()
-    if not nome_saida.endswith('.xlsx'):
-        nome_saida += '.xlsx'
+    for block in blocks:
+        lines = block.strip().splitlines()
+        if not lines or not lines[0].startswith("Question"):
+            continue
 
-    df_final.to_excel(nome_saida, index=False)
-    print(f"\n✅ Arquivo agregado '{nome_saida}' gerado com sucesso!")
-    print(f"📊 Total de questões agregadas: {len(df_final)}")
+        question_text = ""
+        answers = []
+        correct_indexes = []
+        in_question = False
 
+        for i, line in enumerate(lines):
+            line = line.strip()
 
-def gerar_nome_arquivo(origem):
-    nome = origem.lower().replace("practice test", "practice").replace(" ", "") + ".xlsx"
-    return nome
+            if re.match(r"^Question \d+", line):
+                in_question = True
+                continue
 
+            if in_question and not question_text and line and line.upper() != "SKIPPED":
+                question_text = line
+                continue
 
-def menu_principal():
-    print("\n=== Gerenciador de Questões Udemy ===")
-    print("1 - Gerar nova planilha")
-    print("2 - Agregar planilhas existentes")
-    opcao = input("Escolha uma opção (1 ou 2): ").strip()
+            if "Correct answer" in line or "Correct selection" in line:
+                if i + 1 < len(lines):
+                    answer_text = lines[i + 1].strip()
+                    if answer_text not in answers:
+                        answers.append(answer_text)
+                    correct_indexes.append(answers.index(answer_text) + 1)
+            elif line and not line.startswith("Overall explanation") and not line.startswith("Skipped") and not any(kw in line for kw in ["Correct answer", "Correct selection"]):
+                if line not in answers:
+                    answers.append(line)
 
-    if opcao == '1':
-        origem = input("Digite de qual Practice Test essas questões pertencem (ex: Practice Test 1): ").strip()
-        texto = ler_input()
-        questoes = processar_questoes(texto, origem)
-        nome_arquivo = gerar_nome_arquivo(origem)
-        salvar_excel(questoes, nome_arquivo)
+        question_type = "multi-select" if len(correct_indexes) > 1 else "multiple-choice"
 
-    elif opcao == '2':
-        agregar_planilhas()
+        qdata = {
+            "Question": question_text,
+            "Question Type": question_type,
+            "Correct Answers": ",".join(map(str, correct_indexes)),
+            "Overall Explanation": "",
+            "Domain": ""
+        }
 
-    else:
-        print("\nOpção inválida! Tente novamente.")
+        for i in range(6):
+            qdata[f"Answer Option {i+1}"] = answers[i] if i < len(answers) else ""
+            qdata[f"Explanation {i+1}"] = ""
 
+        questions.append(qdata)
 
-if __name__ == "__main__":
-    menu_principal()
+    df_csv = pd.DataFrame(questions, columns=CSV_HEADER)
+
+    df_csv.to_csv(output, index=False)
+
+    st.success(f"✅ {len(df_csv)} questões processadas para CSV!")
+
+    st.download_button(
+        label="📥 Baixar CSV para Udemy",
+        data=output.getvalue(),
+        file_name=f"{nome_arquivo}.csv",
+        mime="text/csv"
+    )
