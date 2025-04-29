@@ -11,6 +11,11 @@ def main():
     with open("styles/main.css") as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
+    # Se está dentro de um app, mostra botão para voltar
+    if page in ["udemy", "financeiro"]:
+        if st.button("⬅️ Voltar ao Portal"):
+            st.query_params.clear()
+
     # Se tem parâmetro de página, carrega o app correto
     if page == "udemy":
         import udemy_practice_test
