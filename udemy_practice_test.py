@@ -29,16 +29,16 @@ def main():
         if st.button("📑 Gerar Questões", use_container_width=True):
             st.session_state["aba_udemy"] = "questoes"
     with col2:
-        if st.button("🎯 Título do Curso", use_container_width=True):
+        if st.button("🎯 Gerar Título do Curso", use_container_width=True):
             st.session_state["aba_udemy"] = "titulo"
     with col3:
-        if st.button("🧠 Intended Learners", use_container_width=True):
+        if st.button("🧠 Gerar Intended Learners", use_container_width=True):
             st.session_state["aba_udemy"] = "learners"
     with col4:
-        if st.button("🖋️ Landing Page", use_container_width=True):
+        if st.button("🖋️ Gerar Landing Page", use_container_width=True):
             st.session_state["aba_udemy"] = "landing"
     with col5:
-        if st.button("✉️ Course Messages", use_container_width=True):
+        if st.button("✉️ Gerar Course Messages", use_container_width=True):
             st.session_state["aba_udemy"] = "mensagens"
 
     aba = st.session_state.get("aba_udemy", "questoes")
@@ -81,7 +81,10 @@ def gerar_titulo_certificacao():
 
     if nome_cert and cod_cert:
         titulo_gerado = f"[{ano_atual}] {nome_cert.strip()} [{cod_cert.strip()}]"
-        st.text_input("Título Gerado", value=titulo_gerado, disabled=True)
+        st.code(titulo_gerado, language="")
+        st.button("📋 Copiar Título", on_click=st.session_state.update, kwargs={"copied_title": titulo_gerado})
+        st.code(titulo_gerado, language="", line_numbers=False)
+        st.button("📋 Copiar Título", on_click=st.session_state.update, kwargs={"copy": titulo_gerado})
     else:
         st.info("🔹 Preencha os dois campos para gerar o título.")
 
