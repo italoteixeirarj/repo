@@ -3,6 +3,7 @@ import pandas as pd
 import io
 import re
 import csv
+from datetime import datetime
 from openpyxl.styles import PatternFill
 from openpyxl.utils import get_column_letter
 
@@ -16,6 +17,22 @@ CSV_HEADER = [
     "Answer Option 6", "Explanation 6",
     "Correct Answers", "Overall Explanation", "Domain"
 ]
+
+# NOVA SEÇÃO: Gerar Título do Curso
+
+def gerar_titulo_certificacao():
+    st.subheader("🎯 Gerar Título do Curso")
+    ano_atual = datetime.now().year
+    nome_cert = st.text_input("Nome da Certificação", placeholder="Ex: AWS Certified Solutions Architect Associate")
+    cod_cert = st.text_input("Código da Certificação", placeholder="Ex: SAA-C03")
+
+    if nome_cert and cod_cert:
+        titulo_gerado = f"[{ano_atual}] {nome_cert.strip()} [{cod_cert.strip()}]"
+        st.text_input("Título Gerado", value=titulo_gerado, disabled=True)
+    else:
+        st.info("🔹 Preencha os dois campos para gerar o título.")
+
+# === MANTÉM AS FUNÇÕES EXISTENTES ABAIXO ===
 
 def processar_questoes(texto, origem):
     questoes = []
