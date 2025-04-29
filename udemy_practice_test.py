@@ -199,7 +199,7 @@ def main():
                 st.warning("⚠️ Por favor, preencha todos os campos.")
                 return
 
-            questoes = processar_questoes(texto)
+            questoes = processar_questoes(texto, nome_arquivo)
 
             if formato == "XLSX (Organizado)":
                 gerar_xlsx(questoes, nome_arquivo)
