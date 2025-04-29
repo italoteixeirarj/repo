@@ -1,12 +1,13 @@
 import streamlit as st
 import pandas as pd
+import re
 import io
 from openpyxl.styles import PatternFill
 from openpyxl.utils import get_column_letter
 
-def processar_questoes(texto):
+def processar_questoes(texto, origem):
     questoes = []
-    blocos = texto.split('Question')
+    blocos = re.split(r'Question \d+', texto)
 
     for bloco in blocos:
         bloco = bloco.strip()
@@ -63,23 +64,23 @@ def processar_questoes(texto):
         if encontrou_true_false and not opcoes:
             opcoes = ["True", "False"]
 
-        if not pergunta.strip() or all(not alt.strip() for alt in opcoes):
-            continue  # Ignora blocos inválidos ou vazios
-
-        while len(opcoes) < 6:
+        while len(opcoes) < 5:
             opcoes.append("")
 
+        pergunta_formatada = pergunta
+        if len(respostas_corretas) > 1:
+            pergunta_formatada += f" ({len(respostas_corretas)} correct)"
+
         questoes.append({
-            "Questão": pergunta,
-            "Alternativa A": opcoes[0],
-            "Alternativa B": opcoes[1],
-            "Alternativa C": opcoes[2],
-            "Alternativa D": opcoes[3],
-            "Alternativa E": opcoes[4],
-            "Alternativa F": opcoes[5],
-            "Resposta Correta": ";".join([chr(65 + i) for i, r in enumerate(opcoes) if r in respostas_corretas]),
+            "Pergunta": pergunta_formatada,
+            "Opção A": opcoes[0],
+            "Opção B": opcoes[1],
+            "Opção C": opcoes[2],
+            "Opção D": opcoes[3],
+            "Opção E": opcoes[4],
+            "Resposta(s) Correta(s)": "; ".join(respostas_corretas),
             "Explicação": explicacao.strip(),
-            "Tipo de Questão": "Múltipla Escolha" if len(respostas_corretas) == 1 else "Múltiplas Escolhas"
+            "Origem": origem
         })
 
     return questoes
