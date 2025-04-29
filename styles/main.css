@@ -1,23 +1,27 @@
-/* Estilos principais para as tiles */
-button[kind="secondary"] {
-    background-color: white !important;
-    color: #333333 !important;
-    font-size: 20px !important;
-    font-weight: 180 !important;
-    padding: 30px 20px !important;
-    border: 2px solid #ddd !important;
-    border-radius: 16px !important;
-    box-shadow: 2px 2px 8px rgba(0,0,0,0.1) !important;
-    transition: all 0.3s ease-in-out;
-    height: 200px !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
+/* Estilos apenas para as tiles da página principal */
+.tile-container {
+    margin-top: 20px;
 }
 
-button[kind="secondary"]:hover {
-    background-color: #f0f0f0 !important;
-    box-shadow: 4px 4px 15px rgba(0,0,0,0.15) !important;
-    transform: scale(1.02);
+.tile {
+    background-color: white;
+    padding: 30px;
+    border-radius: 16px;
+    text-align: center;
+    font-size: 22px;
+    font-weight: 600;
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.3s ease-in-out;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
+    border: 2px solid #ddd;
+}
+
+.tile:hover {
+    background-color: #f0f0f0;
+    box-shadow: 4px 4px 15px rgba(0,0,0,0.2);
+    transform: scale(1.02);
 }

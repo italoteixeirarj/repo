@@ -22,10 +22,10 @@ def main():
     st.markdown("</div>", unsafe_allow_html=True)
 
     # Controle de navegação simulada
-    if st.experimental_get_query_params().get("page") == ["udemy"]:
+    if st.query_params().get("page") == ["udemy"]:
         import udemy_practice_test
         udemy_practice_test.main()
-    elif st.experimental_get_query_params().get("page") == ["financeiro"]:
+    elif st.query_params().get("page") == ["financeiro"]:
         import planejamento_financeiro
         planejamento_financeiro.main()
 
