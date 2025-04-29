@@ -123,6 +123,31 @@ def gerar_csv_udemy(questoes, nome_arquivo):
         mime="text/csv"
     )
 
+def agregar_planilhas(files, formato, nome_arquivo):
+    if formato == "XLSX (Organizado)":
+        dfs = [pd.read_excel(file) for file in files]
+        resultado = pd.concat(dfs, ignore_index=True)
+        output = io.BytesIO()
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            resultado.to_excel(writer, index=False)
+        st.download_button(
+            label="📥 Baixar Planilha Agregada (XLSX)",
+            data=output.getvalue(),
+            file_name=f"{nome_arquivo}_agregado.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+    else:
+        dfs = [pd.read_csv(file) for file in files]
+        resultado = pd.concat(dfs, ignore_index=True)
+        output = io.StringIO()
+        resultado.to_csv(output, index=False, encoding='utf-8-sig')
+        st.download_button(
+            label="📥 Baixar Planilha Agregada (CSV)",
+            data=output.getvalue(),
+            file_name=f"{nome_arquivo}_agregado.csv",
+            mime="text/csv"
+        )
+
 def main():
     st.title("📚 Udemy Practice Test Manager")
 
@@ -156,7 +181,15 @@ def main():
                 gerar_csv_udemy(questoes, nome_arquivo)
 
     elif escolha == "Agregar Planilhas":
-        st.info("🚧 Função de agregação em desenvolvimento...")
+        nome_arquivo = st.text_input("Nome do arquivo final (sem espaços):")
+        formato = st.radio("Escolha o formato das planilhas a agregar:", ("XLSX (Organizado)", "CSV (Importação Udemy)"))
+        files = st.file_uploader("Envie os arquivos para agregar", type=["xlsx", "csv"], accept_multiple_files=True)
+
+        if st.button("Gerar Planilha Agregada"):
+            if not files or not nome_arquivo:
+                st.warning("⚠️ Por favor, envie os arquivos e defina o nome final.")
+                return
+            agregar_planilhas(files, formato, nome_arquivo)
 
 if __name__ == "__main__":
     main()
