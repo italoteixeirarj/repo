@@ -22,15 +22,28 @@ CSV_HEADER = [
 
 def main():
     st.title("📚 Udemy Practice Test Manager")
-    aba = st.radio("Escolha uma funcionalidade:", [
-        "Gerar Questões",
-        "Gerar Título do Curso",
-        "(em breve) Intended Learners",
-        "(em breve) Landing Page",
-        "(em breve) Course Messages"
-    ])
 
-    if aba == "Gerar Questões":
+    col1, col2, col3, col4, col5 = st.columns(5)
+
+    with col1:
+        if st.button("📑 Gerar Questões", use_container_width=True):
+            st.session_state["aba_udemy"] = "questoes"
+    with col2:
+        if st.button("🎯 Título do Curso", use_container_width=True):
+            st.session_state["aba_udemy"] = "titulo"
+    with col3:
+        if st.button("🧠 Intended Learners", use_container_width=True):
+            st.session_state["aba_udemy"] = "learners"
+    with col4:
+        if st.button("🖋️ Landing Page", use_container_width=True):
+            st.session_state["aba_udemy"] = "landing"
+    with col5:
+        if st.button("✉️ Course Messages", use_container_width=True):
+            st.session_state["aba_udemy"] = "mensagens"
+
+    aba = st.session_state.get("aba_udemy", "questoes")
+
+    if aba == "questoes":
         nome_arquivo = st.text_input("Nome do Practice Test (sem espaços):")
         texto = st.text_area("Cole o conteúdo das questões:")
         formato = st.radio("Escolha o formato de exportação:", ("XLSX (Organizado)", "CSV (Importação Udemy)"))
@@ -45,16 +58,16 @@ def main():
                 else:
                     gerar_csv_udemy(texto, nome_arquivo)
 
-    elif aba == "Gerar Título do Curso":
+    elif aba == "titulo":
         gerar_titulo_certificacao()
 
-    elif aba == "(em breve) Intended Learners":
+    elif aba == "learners":
         st.info("🚧 Esta funcionalidade será implementada em breve.")
 
-    elif aba == "(em breve) Landing Page":
+    elif aba == "landing":
         st.info("🚧 Esta funcionalidade será implementada em breve.")
 
-    elif aba == "(em breve) Course Messages":
+    elif aba == "mensagens":
         st.info("🚧 Esta funcionalidade será implementada em breve.")
 
 
@@ -73,7 +86,7 @@ def gerar_titulo_certificacao():
         st.info("🔹 Preencha os dois campos para gerar o título.")
 
 
-# === MANTÉM AS FUNÇÕES EXISTENTES ABAIXO ===
+# === FUNÇÕES EXISTENTES ===
 
 def processar_questoes(texto, origem):
     questoes = []
