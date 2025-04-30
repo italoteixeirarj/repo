@@ -334,6 +334,13 @@ def gerar_csv_udemy(texto, nome_arquivo):
 
 # === GERAR LANDING PAGE ===
 
+def carregar_texto_descricao(cert_id):
+    caminho = f"text/landing_{cert_id}.md"
+    if os.path.exists(caminho):
+        with open(caminho, "r", encoding="utf-8") as f:
+            return f.read()
+    return "Descrição padrão ainda não disponível para esta certificação."
+
 def gerar_landing_page():
     st.subheader("🖋️ Gerar Landing Page")
 
@@ -347,30 +354,8 @@ def gerar_landing_page():
         title = f"[{ano}] {nome_cert} [{cod_cert}]"
         subtitle = f"{nome_cert} Practice Tests [{cod_cert}] + Explanations + {total_questoes} Questions"
 
-        if "aws" in nome_cert.lower():
-            descricao = f"""
-Are you getting ready for the **{nome_cert}** exam and aiming to pass it on your first try? These top-quality practice exams are exactly what you need to evaluate your readiness and boost your confidence!
-
-This collection includes **{total_simulados} full-length practice tests**, each with **{total_questoes // total_simulados} questions** that reflect the real AWS exam difficulty and scope.
-
-These tests simulate the actual exam experience and include detailed explanations, randomized questions, and reference links to help reinforce your AWS knowledge.
-
-After completing each practice test, you'll receive a score report with performance insights to help focus your efforts.
-            """
-        elif "sap" in nome_cert.lower():
-            descricao = f"""
-This set of practice exams prepares you for the **{nome_cert}** certification. You'll explore topics such as Agile Project Planning, Activate Foundation, and Transition Paths for SAP S/4HANA deployments.
-
-Includes **{total_simulados} full practice tests** with a total of **{total_questoes} questions**, aligned to the certification blueprint.
-
-These questions reflect the structure, difficulty, and topics covered in SAP's official content and include full explanations.
-            """
-        else:
-            descricao = f"""
-This course offers **{total_simulados} full practice tests** totaling **{total_questoes} questions** with detailed explanations and realistic questions.
-
-Designed for exam readiness, these tests simulate real certification conditions and provide a strong foundation.
-            """
+        cert_key = cod_cert.lower().replace("-", "_")
+        descricao = carregar_texto_descricao(cert_key)
 
         st.markdown("**Título:**")
         st.code(title)
