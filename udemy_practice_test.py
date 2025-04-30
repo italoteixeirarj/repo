@@ -83,11 +83,22 @@ def gerar_titulo_certificacao():
     if nome_cert and cod_cert:
         titulo_gerado = f"[{ano_atual}] {nome_cert.strip()} [{cod_cert.strip()}]"
 
-        st.markdown("**Título do Curso:**")
-
-        st.code(titulo_gerado, language="")
-        st.markdown("<div style='text-align: right; font-size: 0.75rem; color: gray; font-style: italic;'>Clique para copiar</div>", unsafe_allow_html=True)
-        
+        if len(titulo_gerado) > 60:
+            st.error("❌ O título gerado excede 60 caracteres. Tente abreviar o nome da certificação.")
+        else:
+            st.markdown("**Título do Curso:**")
+            st.code(titulo_gerado, language="")
+            st.markdown("<div style='text-align: right; font-size: 0.75rem; color: gray; font-style: italic;'>Clique para copiar</div>", unsafe_allow_html=True)
+            st.components.v1.html(f"""
+                <script>
+                    const codeBlocks = window.parent.document.querySelectorAll('[data-testid=\"stCodeBlock\"] pre');
+                    codeBlocks.forEach(block => {{
+                        block.onclick = function() {{
+                            navigator.clipboard.writeText(block.innerText);
+                        }}
+                    }});
+                </script>
+            """, height=0)
     else:
         st.info("🔹 Preencha os dois campos para gerar o título.")
 
