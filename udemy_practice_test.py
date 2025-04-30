@@ -86,6 +86,10 @@ def gerar_titulo_certificacao():
         if len(titulo_gerado) > 60:
             st.error("❌ O título gerado excede 60 caracteres. Tente abreviar o nome da certificação.")
         else:
+            st.session_state["titulo_gerado"] = titulo_gerado
+            st.session_state["nome_cert"] = nome_cert.strip()
+            st.session_state["cod_cert"] = cod_cert.strip()
+
             st.markdown("**Título do Curso:**")
             st.code(titulo_gerado, language="")
             st.markdown("<div style='text-align: right; font-size: 0.75rem; color: gray; font-style: italic;'>Clique para copiar</div>", unsafe_allow_html=True)
@@ -101,6 +105,15 @@ def gerar_titulo_certificacao():
             """, height=0)
     else:
         st.info("🔹 Preencha os dois campos para gerar o título.")
+
+def get_dados_certificacao():
+    usar_dados = st.checkbox("Usar dados da seção 'Título do Curso'", value=False)
+    if usar_dados and "nome_cert" in st.session_state and "cod_cert" in st.session_state:
+        return st.session_state["nome_cert"], st.session_state["cod_cert"]
+    else:
+        nome = st.text_input("Nome da Certificação")
+        cod = st.text_input("Código da Certificação")
+        return nome, cod
 
 # === FUNCIONALIDADE: Gerar Título do Curso ===
 
