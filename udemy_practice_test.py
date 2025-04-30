@@ -332,7 +332,7 @@ def gerar_csv_udemy(texto, nome_arquivo):
         mime="text/csv"
     )
 
-# === GERAR LANDING PAGE ===
+# === GERAR LANDING PAGE COM MD ===
 
 def carregar_texto_descricao(cert_id):
     caminho = f"text/landing_{cert_id}.md"
