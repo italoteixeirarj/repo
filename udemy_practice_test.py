@@ -342,6 +342,12 @@ def carregar_template_descricao(tipo):
             return f.read()
     return "Descrição padrão ainda não disponível."
 
+def carregar_template_mensagem(nome_arquivo):
+    caminho = os.path.join(os.getcwd(), f"text/{nome_arquivo}")
+    if os.path.exists(caminho):
+        with open(caminho, "r", encoding="utf-8") as f:
+            return f.read()
+    return "Mensagem padrão ainda não disponível."
 
 def gerar_landing_page():
     st.subheader("🖋️ Gerar Landing Page")
