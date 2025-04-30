@@ -65,7 +65,7 @@ def main():
         gerar_intended_learners()
 
     elif aba == "landing":
-        st.info("🚧 Esta funcionalidade será implementada em breve.")
+        gerar_landing_page()
 
     elif aba == "mensagens":
         st.info("🚧 Esta funcionalidade será implementada em breve.")
@@ -331,3 +331,64 @@ def gerar_csv_udemy(texto, nome_arquivo):
         file_name=f"{nome_arquivo}.csv",
         mime="text/csv"
     )
+
+# === GERAR LANDING PAGE ===
+
+def gerar_landing_page():
+    st.subheader("🖋️ Gerar Landing Page")
+
+    nome_cert = st.text_input("Nome da Certificação", key="nome_cert_landing")
+    cod_cert = st.text_input("Código da Certificação", key="cod_cert_landing")
+    total_questoes = st.number_input("Quantidade total de questões", min_value=10, step=1)
+    total_simulados = st.number_input("Quantidade de simulados completos", min_value=1, step=1)
+
+    if nome_cert and cod_cert and total_questoes > 0 and total_simulados > 0:
+        ano = datetime.now().year
+        title = f"[{ano}] {nome_cert} [{cod_cert}]"
+        subtitle = f"{nome_cert} Practice Tests [{cod_cert}] + Explanations + {total_questoes} Questions"
+
+        if "aws" in nome_cert.lower():
+            descricao = f"""
+Are you getting ready for the **{nome_cert}** exam and aiming to pass it on your first try? These top-quality practice exams are exactly what you need to evaluate your readiness and boost your confidence!
+
+This collection includes **{total_simulados} full-length practice tests**, each with **{total_questoes // total_simulados} questions** that reflect the real AWS exam difficulty and scope.
+
+These tests simulate the actual exam experience and include detailed explanations, randomized questions, and reference links to help reinforce your AWS knowledge.
+
+After completing each practice test, you'll receive a score report with performance insights to help focus your efforts.
+            """
+        elif "sap" in nome_cert.lower():
+            descricao = f"""
+This set of practice exams prepares you for the **{nome_cert}** certification. You'll explore topics such as Agile Project Planning, Activate Foundation, and Transition Paths for SAP S/4HANA deployments.
+
+Includes **{total_simulados} full practice tests** with a total of **{total_questoes} questions**, aligned to the certification blueprint.
+
+These questions reflect the structure, difficulty, and topics covered in SAP's official content and include full explanations.
+            """
+        else:
+            descricao = f"""
+This course offers **{total_simulados} full practice tests** totaling **{total_questoes} questions** with detailed explanations and realistic questions.
+
+Designed for exam readiness, these tests simulate real certification conditions and provide a strong foundation.
+            """
+
+        st.markdown("**Título:**")
+        st.code(title)
+        st.markdown("**Subtítulo:**")
+        st.code(subtitle)
+        st.markdown("**Descrição:**")
+        st.code(descricao.strip())
+
+        st.markdown("<div style='text-align: right; font-size: 0.75rem; color: gray; font-style: italic;'>Clique para copiar</div>", unsafe_allow_html=True)
+        st.components.v1.html(f"""
+            <script>
+                const codeBlocks = window.parent.document.querySelectorAll('[data-testid="stCodeBlock"] pre');
+                codeBlocks.forEach(block => {{
+                    block.onclick = function() {{
+                        navigator.clipboard.writeText(block.innerText);
+                    }}
+                }});
+            </script>
+        """, height=0)
+    else:
+        st.info("🔹 Preencha todos os campos para gerar os textos da Landing Page.")
