@@ -357,8 +357,17 @@ def gerar_landing_page():
         title = f"[{ano}] {nome_cert} [{cod_cert}]"
         subtitle = f"{nome_cert} Practice Tests [{cod_cert}] + Explanations + {total_questoes} Questions"
 
-        cert_key = cod_cert.lower().replace("-", "_")
-        descricao = carregar_texto_descricao(cert_key)
+        if "aws" in nome_cert.lower() or "aws" in cod_cert.lower():
+            modelo = carregar_template_descricao("aws_saa-c03")
+        elif "sap" in nome_cert.lower() or "sap" in cod_cert.lower():
+            modelo = carregar_template_descricao("sap_activate")
+        else:
+            modelo = carregar_template_descricao("default")
+
+        descricao = modelo.replace("{NOME_CERT}", nome_cert)
+        descricao = descricao.replace("{COD_CERT}", cod_cert)
+        descricao = descricao.replace("{TOTAL_QUESTOES}", str(total_questoes))
+        descricao = descricao.replace("{TOTAL_SIMULADOS}", str(total_simulados))
 
         st.markdown("**Título:**")
         st.code(title)
