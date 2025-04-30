@@ -134,18 +134,22 @@ def gerar_intended_learners(nome_cert, cod_cert):
 
     st.markdown("**Resultados de Aprendizagem:**")
     for i, a in enumerate(aprendizados):
-        st.code(a, language="", key=f"aprender_{i}")
-        st.markdown("<div style='text-align: right; font-size: 0.75rem; color: gray; font-style: italic;'>Clique para copiar</div>", unsafe_allow_html=True)
-        st.components.v1.html(f"""
-            <script>
-                const blocks = window.parent.document.querySelectorAll('[data-testid=\"stCodeBlock\"] pre');
-                blocks.forEach(block => {{
-                    block.onclick = function() {{
-                        navigator.clipboard.writeText(block.innerText);
-                    }}
-                }});
-            </script>
-        """, height=0)
+        st.markdown(f"""
+            <div style='background-color:#f5f5f5;padding:10px;border-radius:6px;margin-top:10px;'>
+                <code>{a}</code>
+                <div style='text-align:right;font-size:0.75rem;color:gray;font-style:italic;'>Clique para copiar</div>
+            </div>
+        """, unsafe_allow_html=True)
+    st.components.v1.html(f"""
+        <script>
+            const blocks = window.parent.document.querySelectorAll('[data-testid=\"stMarkdownContainer\"] code');
+            blocks.forEach(block => {{
+                block.parentElement.onclick = function() {{
+                    navigator.clipboard.writeText(block.innerText);
+                }}
+            }});
+        </script>
+    """, height=0)
 
 # === FUNÇÕES EXISTENTES ===
 
