@@ -1,9 +1,9 @@
-Are you getting ready for the **AWS Certified Solutions Architect Associate – SAA-C03** exam and aiming to pass it on your first try? These top-quality AWS Solutions Architect Associate practice exams are exactly what you need to evaluate your readiness and boost your confidence!
+Are you getting ready for the **{NOME_CERT} – {COD_CERT}** exam and aiming to pass it on your first try? These top-quality {NOME_CERT} practice exams are exactly what you need to evaluate your readiness and boost your confidence!
 
-This collection includes **6 comprehensive sets of AWS practice tests**, each containing **65 questions** that closely match the level of difficulty found in the actual Amazon Web Services exam. These practice exams provide one of the most authentic AWS exam experiences available on Udemy, as highlighted by thousands of positive reviews from satisfied students.
+This collection includes **{TOTAL_SIMULADOS} comprehensive sets** of practice tests, each containing **{TOTAL_QUESTOES} questions** that closely match the level of difficulty found in the real certification exam. These practice exams provide one of the most authentic experiences available on Udemy.
 
-If you're searching for overly simple questions, these practice tests may not be the right fit. Our students value these in-depth exams because they **simulate the real certification test**, enhancing their understanding of AWS concepts.
+If you're searching for overly simple questions, these practice tests may not be the right fit. Our students value these in-depth exams because they **simulate the real certification test**, enhancing their understanding of the concepts.
 
-But don’t just take our word for it—our reviews speak for themselves! They confirm that our AWS practice questions align closely with the **SAA-C03 exam** format and challenge level, equipping you with the knowledge and confidence needed to succeed on exam day.
+But don’t just take our word for it—our reviews speak for themselves! They confirm that our practice questions align closely with the **{COD_CERT} exam** format and challenge level, equipping you with the knowledge and confidence needed to succeed.
 
-After completing the practice test, you’ll receive a detailed report that provides valuable insights into your progress and highlights the AWS knowledge areas where you should focus your efforts to maximize your study effectiveness.
+After completing the practice test, you’ll receive a detailed report that provides valuable insights into your progress and highlights the knowledge areas where you should focus your efforts to maximize your study effectiveness.
