@@ -64,16 +64,15 @@ def main():
 
     elif aba == "learners":
         nome_cert, cod_cert = get_dados_certificacao("learners")
-        gerar_intended_learners()
+        gerar_intended_learners(nome_cert, cod_cert)
 
     elif aba == "landing":
         nome_cert, cod_cert = get_dados_certificacao("landing")
-        gerar_landing_page()
+        gerar_landing_page(nome_cert, cod_cert)
 
     elif aba == "mensagens":
         nome_cert, cod_cert = get_dados_certificacao("mensagens")
-        gerar_course_messages()
-
+        gerar_course_messages(nome_cert, cod_cert)
 
 # === FUNCIONALIDADE: Gerar Título do Curso ===
 
