@@ -109,13 +109,13 @@ def gerar_titulo_certificacao():
     else:
         st.info("🔹 Preencha os dois campos para gerar o título.")
 
-def get_dados_certificacao():
-    usar_dados = st.checkbox("Usar dados da seção 'Título do Curso'", value=False)
+def get_dados_certificacao(scope=""):
+    usar_dados = st.checkbox("Usar dados da seção 'Título do Curso'", key=f"usar_dados_{scope}")
     if usar_dados and "nome_cert" in st.session_state and "cod_cert" in st.session_state:
         return st.session_state["nome_cert"], st.session_state["cod_cert"]
     else:
-        nome = st.text_input("Nome da Certificação")
-        cod = st.text_input("Código da Certificação")
+        nome = st.text_input("Nome da Certificação", key=f"nome_cert_{scope}")
+        cod = st.text_input("Código da Certificação", key=f"cod_cert_{scope}")
         return nome, cod
 
 # === FUNCIONALIDADE: Gerar Título do Curso ===
