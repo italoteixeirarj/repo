@@ -119,37 +119,72 @@ def get_dados_certificacao(scope=""):
 
 # === FUNCIONALIDADE: Gerar Título do Curso ===
 
-def gerar_intended_learners(nome_cert, cod_cert):
+def gerar_intended_learners():
     st.subheader("🧠 Gerar Intended Learners")
 
-    if not nome_cert or not cod_cert:
-        st.warning("⚠️ Preencha o nome e o código da certificação para continuar.")
-        return
+    nome_cert = st.text_input("Nome da Certificação", key="nome_cert_learners")
+    cod_cert = st.text_input("Código da Certificação", key="cod_cert_learners")
 
-    aprendizados = [
-        f"Identify your strengths and weaknesses in preparation for the {nome_cert} ({cod_cert}) exam.",
-        f"Simulate the real exam environment with practice tests for {cod_cert}.",
-        f"Boost your confidence and readiness to pass the {nome_cert} certification on the first try."
-    ]
+    if nome_cert and cod_cert:
+        area = "aws" if "aws" in nome_cert.lower() else "sap" if "sap" in nome_cert.lower() else "geral"
 
-    st.markdown("**Resultados de Aprendizagem:**")
-    for i, a in enumerate(aprendizados):
-        st.markdown(f"""
-            <div>
-                <code>{a}</code>
-                <div style='text-align:right;font-size:0.75rem;color:gray;font-style:italic;'>Clique para copiar</div>
-            </div>
-        """, unsafe_allow_html=True)
-    st.components.v1.html(f"""
-        <script>
-            const blocks = window.parent.document.querySelectorAll('[data-testid=\"stMarkdownContainer\"] code');
-            blocks.forEach(block => {{
-                block.parentElement.onclick = function() {{
-                    navigator.clipboard.writeText(block.innerText);
-                }}
-            }});
-        </script>
-    """, height=0)
+        if area == "aws":
+            aprendizados = [
+                "EXAM SIMULATION: All practice tests are timed and scored (passing score is 72%) mimicking the real exam.",
+                "ASSESS YOUR EXAM READINESS: Pass the exam with a great score.",
+                "DETAILED EXPLANATIONS: Every question includes a detailed explanation.",
+                "RANDOMIZED QUESTIONS: The questions and answers are randomized to ensure challenge.",
+                "ALWAYS UP TO DATE: Content is constantly updated based on real exam feedback.",
+                "REFERENCE LINKS: Help you understand AWS concepts."
+            ]
+            requisitos = [
+                f"Students are required to have successfully passed the {nome_cert} exam.",
+                f"Before assessing readiness, it's recommended to complete {nome_cert} documentation or course."
+            ]
+            publico = [
+                f"Candidates for the {nome_cert} exam who want to pass on their first attempt.",
+                "Students preparing for the exam who want to pass with confidence.",
+                "IT Professionals entering AWS technical job interviews.",
+                "Anyone who wants to test their skills in exam simulation."
+            ]
+
+        elif area == "sap":
+            aprendizados = [
+                "Practice Test 1 (30 questions)",
+                "Practice Test 2 (30 questions)",
+                "Practice Test 3 (30 questions)",
+                "Practice Test 4 (30 questions)",
+                "Practice Test 5 (35 questions)",
+                "Practice Test Bonus (53 questions)"
+            ]
+            requisitos = ["SAP Basis"]
+            publico = [
+                "SAP Basis consultants",
+                "SAP HANA Consultants",
+                "Database Administrators for SAP HANA",
+                "SAP Consultants"
+            ]
+
+        else:
+            aprendizados = ["General practice test with varied questions and detailed feedback."]
+            requisitos = ["No prerequisites. This course is accessible to all learners."]
+            publico = ["Beginners and professionals seeking exam readiness."]
+
+        st.markdown("---")
+        st.markdown("**✅ O que os alunos aprenderão:**")
+        for i, a in enumerate(aprendizados):
+            st.code(a, language="")
+
+        st.markdown("**📌 Requisitos ou pré-requisitos:**")
+        for i, r in enumerate(requisitos):
+            st.code(r, language="")
+
+        st.markdown("**🎯 Público-alvo:**")
+        for i, p in enumerate(publico):
+            st.code(p, language="")
+
+    else:
+        st.info("🔹 Preencha os campos para gerar as sugestões.")
 
 # === FUNÇÕES EXISTENTES ===
 
