@@ -135,7 +135,7 @@ def gerar_intended_learners(nome_cert, cod_cert):
     st.markdown("**Resultados de Aprendizagem:**")
     for i, a in enumerate(aprendizados):
         st.markdown(f"""
-            <div style='background-color:#f5f5f5;padding:10px;border-radius:6px;margin-top:10px;'>
+            <div>
                 <code>{a}</code>
                 <div style='text-align:right;font-size:0.75rem;color:gray;font-style:italic;'>Clique para copiar</div>
             </div>
