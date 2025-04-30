@@ -69,7 +69,7 @@ def main():
         gerar_landing_page()
 
     elif aba == "mensagens":
-        st.info("🚧 Esta funcionalidade será implementada em breve.")
+        gerar_course_messages()
 
 
 # === FUNCIONALIDADE: Gerar Título do Curso ===
@@ -388,3 +388,35 @@ def gerar_landing_page():
         """, height=0)
     else:
         st.info("🔹 Preencha todos os campos para gerar os textos da Landing Page.")
+
+def gerar_course_messages():
+    st.subheader("✉️ Gerar Course Messages")
+
+    nome_cert = st.text_input("Nome da Certificação", key="nome_cert_msg")
+    cod_cert = st.text_input("Código da Certificação", key="cod_cert_msg")
+
+    if nome_cert and cod_cert:
+        welcome = carregar_template_mensagem("welcome_message.md")
+        congrats = carregar_template_mensagem("congrats_message.md")
+
+        welcome = welcome.replace("{NOME_CERT}", nome_cert).replace("{COD_CERT}", cod_cert)
+        congrats = congrats.replace("{NOME_CERT}", nome_cert).replace("{COD_CERT}", cod_cert)
+
+        st.markdown("**📬 Welcome Message:**")
+        st.code(welcome.strip())
+        st.markdown("**🎉 Congratulations Message:**")
+        st.code(congrats.strip())
+
+        st.markdown("<div style='text-align: right; font-size: 0.75rem; color: gray; font-style: italic;'>Clique para copiar</div>", unsafe_allow_html=True)
+        st.components.v1.html(f"""
+            <script>
+                const codeBlocks = window.parent.document.querySelectorAll('[data-testid=\"stCodeBlock\"] pre');
+                codeBlocks.forEach(block => {{
+                    block.onclick = function() {{
+                        navigator.clipboard.writeText(block.innerText);
+                    }}
+                }});
+            </script>
+        """, height=0)
+    else:
+        st.info("🔹 Preencha os dois campos para gerar as mensagens do curso.")
