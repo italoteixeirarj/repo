@@ -335,11 +335,13 @@ def gerar_csv_udemy(texto, nome_arquivo):
 # === GERAR LANDING PAGE COM MD ===
 
 def carregar_texto_descricao(cert_id):
-    caminho = f"text/landing_{cert_id}.md"
+    base_path = os.path.join(os.getcwd(), "text")
+    caminho = os.path.join(base_path, f"landing_{cert_id}.md")
     if os.path.exists(caminho):
         with open(caminho, "r", encoding="utf-8") as f:
             return f.read()
     return "Descrição padrão ainda não disponível para esta certificação."
+
 
 def gerar_landing_page():
     st.subheader("🖋️ Gerar Landing Page")
