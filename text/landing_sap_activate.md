@@ -1,5 +1,5 @@
-This practice exam set is designed for candidates preparing for the **SAP Activate Project Manager** certification.
+This course is designed to help professionals prepare for the **{NOME_CERT} – {COD_CERT}** certification exam. With **{TOTAL_SIMULADOS} full-length practice tests** and a total of **{TOTAL_QUESTOES} questions**, learners will gain a deep understanding of the SAP Activate methodology, project phases, and agile delivery concepts.
 
-You’ll cover core topics like Agile Project Planning, SAP Activate Methodology, and deployment strategies across SAP S/4HANA systems. The questions reflect the format and challenge level of the real SAP exam.
+Topics covered include SAP Activate Fundamentals, Workstreams Overview, Methodology Foundation, Transition Paths, and more. These exams simulate real-world scenarios and are based on the official certification syllabus.
 
-The course includes **5 full-length practice tests** with more than **150 questions**, each with explanations to enhance your understanding and confidence before the certification.
+Ideal for SAP project managers, consultants, and developers, this practice set ensures that learners build confidence, identify knowledge gaps, and maximize their performance in the actual certification test.
