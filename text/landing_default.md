@@ -8,7 +8,7 @@ But don’t just take our word for it—our reviews speak for themselves! They c
 
 This {COD_CERT} practice test course includes:
 
-- {TOTAL_QUESTOES} exam-style questions with detailed answers and explanations to reinforce your understanding of the core concepts  
+- {TOTAL_PERGUNTAS} exam-style questions with detailed answers and explanations to reinforce your understanding of the core concepts  
 
 - 100% aligned with the latest {COD_CERT} exam  
 

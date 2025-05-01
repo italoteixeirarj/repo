@@ -360,6 +360,7 @@ def gerar_landing_page(nome_cert, cod_cert):
     subtitulo = st.text_input("Subtítulo do Curso (até 120 caracteres)", max_chars=120)
     num_questoes = st.number_input("Número de Questões", min_value=1, step=1)
     num_testes = st.number_input("Número de Testes", min_value=1, step=1)
+    total_perguntas = num_questoes * num_testes
 
     cod_key = cod_cert.lower().replace("-", "_")
     caminho = f"text/landing_{cod_key}.md"
@@ -371,6 +372,7 @@ def gerar_landing_page(nome_cert, cod_cert):
     descricao = descricao.replace("{COD_CERT}", cod_cert)
     descricao = descricao.replace("{TOTAL_QUESTOES}", str(num_questoes))
     descricao = descricao.replace("{TOTAL_SIMULADOS}", str(num_testes))
+    descricao = descricao.replace("{TOTAL_PERGUNTAS}", str(total_perguntas))
 
     st.markdown("### Course Description")
     st.code(descricao.strip(), language="markdown")
