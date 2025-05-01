@@ -396,7 +396,7 @@ def gerar_course_messages(nome_cert, cod_cert):
     st.subheader("✉️ Gerar Course Messages")
 
     for campo in ["welcome", "congrats"]:
-        caminho = f"text/messages_{campo}.md"
+        caminho = f"text/message_{campo}.md"
         if PathlibPath(caminho).exists():
             texto = carregar_md_personalizado(caminho, nome_cert, cod_cert)
             texto = texto.replace("{NOME_CERT}", nome_cert)
