@@ -131,6 +131,7 @@ def gerar_csv_udemy(texto):
         correct_answers_text = []
         explanation = ""
         parsing_answers = False
+        parsing_question = True
 
         for i, line in enumerate(lines):
             line = line.strip()
@@ -138,30 +139,28 @@ def gerar_csv_udemy(texto):
             if re.match(r"^Question \d+", line):
                 continue
 
-            if not question_text and line and line.upper() != "SKIPPED":
-                question_text += line + " "
-                continue
-
-            if line.lower().startswith("correct answer") or line.lower().startswith("correct selection"):
-                parsing_answers = True
-                next_line = lines[i + 1].strip() if i + 1 < len(lines) else ""
-                if next_line:
-                    correct_answers_text.append(next_line)
-                continue
-
-            if line.lower().startswith("overall explanation"):
-                explanation = " ".join(lines[i + 1:]).strip()
-                break
+            if parsing_question:
+                if line.lower().startswith("correct answer") or line.lower().startswith("correct selection"):
+                    parsing_question = False
+                    parsing_answers = True
+                    next_line = lines[i + 1].strip() if i + 1 < len(lines) else ""
+                    if next_line:
+                        correct_answers_text.append(next_line)
+                    continue
+                elif line and not line.lower().startswith("skipped"):
+                    question_text += line + "\n"
+                    continue
 
             if parsing_answers:
                 if line and line not in correct_answers_text and not any(kw in line.lower() for kw in ["correct answer", "correct selection", "overall explanation"]):
                     answers.append(line)
 
-        # Corrigir caso os bullets (•) entrem como alternativas
-        answers = [a for a in answers if not a.startswith("•")]
+            if line.lower().startswith("overall explanation"):
+                explanation = " ".join(lines[i + 1:]).strip()
+                break
 
-        # Corrigir se tiver menos de 2 opções válidas
-        answers = [a for a in answers if a]
+        question_text = question_text.strip()
+        answers = [a for a in answers if not a.startswith("•") and a.strip()]
         if len(answers) < 2:
             if "True" in correct_answers_text or "False" in correct_answers_text:
                 answers = ["True", "False"]
