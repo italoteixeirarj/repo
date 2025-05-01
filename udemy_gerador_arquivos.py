@@ -26,8 +26,6 @@ ASSISTANT_ID = "asst_5TeFXS410FdC2LZvAvOIqa96"
 
 client = OpenAI()
 
-# Função para verificar se a execução da IA foi concluída
-
 def aguardar_resposta(thread_id, run_id, timeout=60):
     for _ in range(timeout):
         run_status = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run_id)
@@ -159,9 +157,10 @@ Extraia da pergunta abaixo a estrutura JSON exatamente no seguinte formato (não
 
 Regras:
 - Separe o enunciado da pergunta e as opções corretamente.
+- As opções devem estar listadas abaixo do enunciado, e não embutidas nele.
 - Sempre preencha no mínimo 2 opções de resposta.
-- Se houver uma ou mais respostas corretas, use números (1 a 6) no campo "Correct Answers".
-- Nunca coloque as opções dentro do texto da pergunta.
+- Use apenas números de 1 a 6 no campo "Correct Answers".
+- Não confunda listas de enunciado com alternativas de resposta.
 - Retorne apenas o JSON e nada mais.
 
 Pergunta:
@@ -183,7 +182,7 @@ Pergunta:
             return None
 
         final_msg = client.beta.threads.messages.list(thread_id=thread_id).data[0].content[0].text.value
-        st.markdown("🧠 **Resposta recebida da IA:**")
+        st.markdown("🧑‍🧠 **Resposta recebida da IA:**")
         st.code(final_msg, language="json")
         try:
             return json.loads(final_msg)
