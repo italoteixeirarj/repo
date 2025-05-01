@@ -30,80 +30,47 @@ def processar_questoes(texto, origem):
         if not bloco:
             continue
 
-        linhas = bloco.split("\n")
-        pergunta = ""
-        opcoes = []
-        respostas_corretas = []
-        explicacao = ""
-        captura_explicacao = False
-        encontrou_true_false = False
-
-        for i, linha in enumerate(linhas):
-            linha = linha.strip()
-
-            if i == 0 and linha.lower() == 'skipped':
-                continue
-
-            if i == 1 and linha != '':
-                pergunta = linha
-                continue
-
-            if linha.lower() in [
-                'choose the correct answer.',
-                'there are two correct answers.',
-                'there are three correct answers.',
-                'there are four correct answers.',
-                'there are five correct answers.'
-            ]:
-                continue
-
-            if linha.lower().startswith('correct answer') or linha.lower().startswith('correct selection'):
-                try:
-                    resposta = linhas[i+1].strip()
-                    if resposta:
-                        respostas_corretas.append(resposta)
-                except:
-                    pass
-
-            elif linha.lower().startswith('overall explanation'):
-                captura_explicacao = True
-
-            elif captura_explicacao:
-                explicacao += linha + " "
-
-            else:
-                if linha and not linha.lower().startswith('note') and not linha.lower().startswith('skipped'):
-                    if linha.startswith("•"):
-                        pergunta += "\n" + linha
-                    elif linha.lower() in ['true', 'false']:
-                        encontrou_true_false = True
-                        opcoes.append(linha)
-                    else:
-                        opcoes.append(linha)
-
-        if encontrou_true_false and not opcoes:
-            opcoes = ["True", "False"]
-
-        while len(opcoes) < 5:
-            opcoes.append("")
-
-        pergunta_formatada = pergunta
-        if len(respostas_corretas) > 1:
-            pergunta_formatada += f" ({len(respostas_corretas)} correct)"
-
-        questoes.append({
-            "Pergunta": pergunta_formatada,
-            "Opção A": opcoes[0],
-            "Opção B": opcoes[1],
-            "Opção C": opcoes[2],
-            "Opção D": opcoes[3],
-            "Opção E": opcoes[4],
-            "Resposta(s) Correta(s)": "; ".join(respostas_corretas),
-            "Explicação": explicacao.strip(),
-            "Origem": origem
-        })
+        question_data = gerar_pergunta_xlsx_com_ia(bloco)
+        if question_data:
+            question_data["Origem"] = origem
+            questoes.append(question_data)
 
     return questoes
+
+def gerar_pergunta_xlsx_com_ia(bloco):
+    prompt = f"""
+Você é um assistente que extrai perguntas de simulados para um arquivo Excel.
+A estrutura da pergunta deve ser formatada como:
+
+Pergunta: Pergunta completa (adicione a quantidade de corretas, se houver mais de uma)
+Opção A: Texto da opção A
+Opção B: Texto da opção B
+Opção C: Texto da opção C
+Opção D: Texto da opção D
+Opção E: Texto da opção E
+Resposta(s) Correta(s): Texto(s) exato(s) das respostas corretas (separadas por ponto e vírgula se mais de uma)
+Explicação: Texto explicando a resposta correta
+
+A partir do seguinte bloco, extraia esses campos e me retorne em formato JSON:
+{bloco.strip()}
+"""
+
+    client = OpenAI()
+    response = client.chat.completions.create(
+        model="gpt-4",
+        messages=[
+            {"role": "system", "content": "Você é um assistente para formatação de simulados em Excel."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.2
+    )
+
+    try:
+        content = response.choices[0].message.content.strip()
+        dados = eval(content) if content.startswith("{") else {}
+        return dados
+    except:
+        return None
 
 def gerar_xlsx(questoes, nome_arquivo):
     df = pd.DataFrame(questoes)
