@@ -21,6 +21,12 @@ CSV_HEADER = [
     "Correct Answers", "Overall Explanation", "Domain"
 ]
 
+def obter_cliente_openai():
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        raise ValueError("OPENAI_API_KEY não configurada nas variáveis de ambiente.")
+    return OpenAI(api_key=api_key)
+
 def processar_questoes(texto, origem):
     questoes = []
     blocos = re.split(r'Question \d+', texto)
@@ -55,7 +61,7 @@ A partir do seguinte bloco, extraia esses campos e me retorne em formato JSON:
 {bloco.strip()}
 """
 
-    client = OpenAI()
+    client = obter_cliente_openai()
     response = client.chat.completions.create(
         model="gpt-4",
         messages=[
@@ -120,7 +126,7 @@ Extraia os dados do seguinte bloco e me responda em JSON:
 {bloco.strip()}
 """
 
-    client = OpenAI()
+    client = obter_cliente_openai()
     response = client.chat.completions.create(
         model="gpt-4",
         messages=[
