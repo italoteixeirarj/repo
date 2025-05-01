@@ -7,7 +7,7 @@ from datetime import datetime
 from openpyxl.styles import PatternFill
 from openpyxl.utils import get_column_letter
 from pathlib import Path as PathlibPath
-import openai
+from openai import OpenAI
 
 CSV_HEADER = [
     "Question", "Question Type",
@@ -20,11 +20,10 @@ CSV_HEADER = [
     "Correct Answers", "Overall Explanation", "Domain"
 ]
 
-def configurar_openai():
-    api_key = st.secrets.get("OPENAI_API_KEY")
-    if not api_key:
-        raise ValueError("OPENAI_API_KEY não configurada em st.secrets.")
-    openai.api_key = api_key
+ASSISTANT_ID = "asst_5TeFXS410FdC2LZvAvOIqa96"
+
+# Inicializar cliente OpenAI com chave da variável de ambiente
+client = OpenAI()
 
 def processar_questoes(texto, origem):
     questoes = []
@@ -35,7 +34,9 @@ def processar_questoes(texto, origem):
         if not bloco:
             continue
 
-        question_data = gerar_pergunta_xlsx_com_ia(bloco)
+        with st.spinner("🔄 Processando questão com IA..."):
+            question_data = gerar_pergunta_xlsx_com_ia(bloco)
+
         if question_data:
             question_data["Origem"] = origem
             questoes.append(question_data)
@@ -44,37 +45,43 @@ def processar_questoes(texto, origem):
 
 def gerar_pergunta_xlsx_com_ia(bloco):
     prompt = f"""
-Você é um assistente que extrai perguntas de simulados para um arquivo Excel.
-A estrutura da pergunta deve ser formatada como:
+Extraia a seguinte estrutura JSON da questão abaixo. Se houver listas no enunciado (por exemplo, com marcadores como •, -, * ou números), preserve os itens em nova linha para facilitar a leitura.
 
-Pergunta: Pergunta completa (adicione a quantidade de corretas, se houver mais de uma)
-Opção A: Texto da opção A
-Opção B: Texto da opção B
-Opção C: Texto da opção C
-Opção D: Texto da opção D
-Opção E: Texto da opção E
-Resposta(s) Correta(s): Texto(s) exato(s) das respostas corretas (separadas por ponto e vírgula se mais de uma)
-Explicação: Texto explicando a resposta correta
+Retorne no seguinte formato:
+{{
+  "Pergunta": "...",
+  "Opção A": "...",
+  "Opção B": "...",
+  "Opção C": "...",
+  "Opção D": "...",
+  "Opção E": "...",
+  "Resposta(s) Correta(s)": "Texto(s) exato(s) da(s) resposta(s) correta(s)",
+  "Explicação": "..."
+}}
 
-A partir do seguinte bloco, extraia esses campos e me retorne em formato JSON:
+Texto:
 {bloco.strip()}
 """
 
-    configurar_openai()
-    response = openai.ChatCompletion.create(
-        model="gpt-4",
-        messages=[
-            {"role": "system", "content": "Você é um assistente para formatação de simulados em Excel."},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0.2
-    )
-
     try:
-        content = response.choices[0].message.content.strip()
-        dados = eval(content) if content.startswith("{") else {}
-        return dados
-    except:
+        thread = client.beta.threads.create()
+        client.beta.threads.messages.create(
+            thread_id=thread.id,
+            role="user",
+            content=prompt
+        )
+
+        with st.spinner("🧠 Gerando resposta com Assistant..."):
+            response = client.beta.threads.run_and_poll(
+                thread_id=thread.id,
+                assistant_id=ASSISTANT_ID
+            )
+
+        final_msg = client.beta.threads.messages.list(thread_id=thread.id).data[0].content[0].text.value
+        return eval(final_msg) if final_msg.startswith("{") else None
+
+    except Exception as e:
+        st.error(f"Erro ao processar com IA: {e}")
         return None
 
 def gerar_xlsx(questoes, nome_arquivo):
@@ -89,14 +96,14 @@ def gerar_xlsx(questoes, nome_arquivo):
             ws.column_dimensions[col_letter].width = 30
 
 def gerar_csv_udemy(texto):
-    configurar_openai()
     output = io.StringIO()
     questions = []
-
     blocks = re.split(r"(?=Question \d+\n)", texto.strip())
 
     for block in blocks:
-        question_data = gerar_pergunta_csv_com_ia(block)
+        with st.spinner("🔄 Processando questão com IA..."):
+            question_data = gerar_pergunta_csv_com_ia(block)
+
         if question_data:
             questions.append(question_data)
 
@@ -107,37 +114,43 @@ def gerar_csv_udemy(texto):
 
 def gerar_pergunta_csv_com_ia(bloco):
     prompt = f"""
-Você é um assistente que extrai perguntas de simulados no formato Udemy CSV.
-A estrutura da pergunta é como no exemplo abaixo:
+Extraia a seguinte estrutura JSON da pergunta abaixo:
 
-Question: Pergunta completa
-Question Type: multiple-choice ou multi-select
-Answer Option 1: Opção A
-Answer Option 2: Opção B
-Answer Option 3: Opção C
-Answer Option 4: Opção D
-Answer Option 5: Opção E (se houver)
-Answer Option 6: Opção F (se houver)
-Correct Answers: índice(s) da(s) opção(ões) correta(s), separados por vírgula (ex: 1,3)
-Overall Explanation: Explicação detalhada
-Domain: (deixe em branco)
+{{
+  "Question": "...",
+  "Question Type": "multiple-choice" ou "multi-select",
+  "Answer Option 1": "...",
+  "Answer Option 2": "...",
+  "Answer Option 3": "...",
+  "Answer Option 4": "...",
+  "Answer Option 5": "...",
+  "Answer Option 6": "...",
+  "Correct Answers": "1,3",
+  "Overall Explanation": "...",
+  "Domain": ""
+}}
 
-Extraia os dados do seguinte bloco e me responda em JSON:
+Texto:
 {bloco.strip()}
 """
 
-    response = openai.ChatCompletion.create(
-        model="gpt-4",
-        messages=[
-            {"role": "system", "content": "Você é um assistente para formatação de simulados Udemy."},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0.2
-    )
-
     try:
-        content = response.choices[0].message.content.strip()
-        dados = eval(content) if content.startswith("{") else {}
-        return dados
-    except:
+        thread = client.beta.threads.create()
+        client.beta.threads.messages.create(
+            thread_id=thread.id,
+            role="user",
+            content=prompt
+        )
+
+        with st.spinner("🧠 Gerando resposta com Assistant..."):
+            response = client.beta.threads.run_and_poll(
+                thread_id=thread.id,
+                assistant_id=ASSISTANT_ID
+            )
+
+        final_msg = client.beta.threads.messages.list(thread_id=thread.id).data[0].content[0].text.value
+        return eval(final_msg) if final_msg.startswith("{") else None
+
+    except Exception as e:
+        st.error(f"Erro ao processar com IA: {e}")
         return None
