@@ -108,6 +108,8 @@ def gerar_titulo_certificacao():
     else:
         st.info("🔹 Preencha os dois campos para gerar o título.")
 
+# === FUNÇÕES INTENDED LEARNERS ===
+
 def get_dados_certificacao(scope=""):
     usar_dados = st.checkbox("Usar dados da seção 'Título do Curso'", key=f"usar_dados_{scope}")
     if usar_dados and "nome_cert" in st.session_state and "cod_cert" in st.session_state:
@@ -117,7 +119,12 @@ def get_dados_certificacao(scope=""):
         cod = st.text_input("Código da Certificação", key=f"cod_cert_{scope}")
         return nome, cod
 
-# === FUNCIONALIDADE: Gerar Título do Curso ===
+def carregar_md_personalizado(caminho, nome_cert, cod_cert):
+    try:
+        texto = Path(caminho).read_text(encoding="utf-8")
+        return texto.replace("{course_name}", nome_cert).replace("{course_code}", cod_cert)
+    except FileNotFoundError:
+        return "Arquivo de template não encontrado."
 
 def gerar_intended_learners(nome_cert, cod_cert):
     st.subheader("🧠 Gerar Intended Learners")
@@ -126,16 +133,19 @@ def gerar_intended_learners(nome_cert, cod_cert):
         st.warning("⚠️ Preencha o nome e o código da certificação para continuar.")
         return
 
-    aprendizados = [
-        f"Identify your strengths and weaknesses in preparation for the {nome_cert} ({cod_cert}) exam.",
-        f"Simulate the real exam environment with practice tests for {cod_cert}.",
-        f"Boost your confidence and readiness to pass the {nome_cert} certification on the first try."
-    ]
+    textos = {
+        "What will students learn in your course?": "text/intended_learn_what.md",
+        "What are the requirements or prerequisites for taking your course?": "text/intended_learn_requirements.md",
+        "Who is this course for?": "text/intended_learn_target.md",
+    }
 
-    st.markdown("**Resultados de Aprendizagem:**")
-    for a in aprendizados:
-        st.code(a, language="")
-        st.markdown("<div style='text-align: right; font-size: 0.75rem; color: gray; font-style: italic;'>Clique para copiar</div>", unsafe_allow_html=True)
+    for titulo, caminho in textos.items():
+        st.markdown(f"### {titulo}")
+        conteudo = carregar_md_personalizado(caminho, nome_cert, cod_cert)
+        for linha in conteudo.strip().split("\n"):
+            if linha:
+                st.code(linha.strip(), language="")
+                st.markdown("<div style='text-align: right; font-size: 0.75rem; color: gray; font-style: italic;'>Clique para copiar</div>", unsafe_allow_html=True)
 
     st.components.v1.html(f"""
         <script>
@@ -147,7 +157,6 @@ def gerar_intended_learners(nome_cert, cod_cert):
             }});
         </script>
     """, height=0)
-
 
 # === FUNÇÕES EXISTENTES ===
 
