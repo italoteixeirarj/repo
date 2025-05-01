@@ -356,19 +356,19 @@ def gerar_landing_page(nome_cert, cod_cert):
         st.warning("⚠️ Preencha o nome e o código da certificação para continuar.")
         return
 
-    # Campo 1 - Título do Curso
     titulo = st.text_input("Título do Curso", value=st.session_state.get("titulo_gerado", ""), max_chars=60)
+    subtitulo = st.text_input("Subtítulo do Curso (até 120 caracteres)", max_chars=120)
+    num_questoes = st.number_input("Número de Questões", min_value=1, step=1)
+    num_testes = st.number_input("Número de Testes", min_value=1, step=1)
 
-    # Campo 2 - Subtítulo
-    subtitulo = st.text_input("Subtítulo do Curso (até 48 caracteres)", max_chars=48)
-
-    # Campo 3 - Descrição
     cod_key = cod_cert.lower().replace("-", "_")
     caminho = f"text/landing_{cod_key}.md"
     if not PathlibPath(caminho).exists():
         caminho = "text/landing_default.md"
 
     descricao = carregar_md_personalizado(caminho, nome_cert, cod_cert)
+    descricao = descricao.replace("{num_questions}", str(num_questoes))
+    descricao = descricao.replace("{num_tests}", str(num_testes))
 
     st.markdown("### Course Description")
     st.code(descricao.strip(), language="markdown")
