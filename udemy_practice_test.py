@@ -392,34 +392,26 @@ def gerar_landing_page(nome_cert, cod_cert):
     """, height=0)
 
 
-def gerar_course_messages():
+def gerar_course_messages(nome_cert, cod_cert):
     st.subheader("✉️ Gerar Course Messages")
 
-    nome_cert = st.text_input("Nome da Certificação", key="nome_cert_msg")
-    cod_cert = st.text_input("Código da Certificação", key="cod_cert_msg")
+    for campo in ["welcome", "congrats", "reminder"]:
+        caminho = f"text/messages_{campo}.md"
+        if PathlibPath(caminho).exists():
+            texto = carregar_md_personalizado(caminho, nome_cert, cod_cert)
+            texto = texto.replace("{NOME_CERT}", nome_cert)
+            texto = texto.replace("{COD_CERT}", cod_cert)
+            st.markdown(f"### {campo.capitalize()} Message")
+            st.code(texto.strip(), language="markdown")
+            st.markdown("<div style='text-align: right; font-size: 0.75rem; color: gray; font-style: italic;'>Clique para copiar</div>", unsafe_allow_html=True)
 
-    if nome_cert and cod_cert:
-        welcome = carregar_template_mensagem("welcome_message.md")
-        congrats = carregar_template_mensagem("congrats_message.md")
-
-        welcome = welcome.replace("{NOME_CERT}", nome_cert).replace("{COD_CERT}", cod_cert)
-        congrats = congrats.replace("{NOME_CERT}", nome_cert).replace("{COD_CERT}", cod_cert)
-
-        st.markdown("**📬 Welcome Message:**")
-        st.code(welcome.strip())
-        st.markdown("**🎉 Congratulations Message:**")
-        st.code(congrats.strip())
-
-        st.markdown("<div style='text-align: right; font-size: 0.75rem; color: gray; font-style: italic;'>Clique para copiar</div>", unsafe_allow_html=True)
-        st.components.v1.html(f"""
-            <script>
-                const codeBlocks = window.parent.document.querySelectorAll('[data-testid=\"stCodeBlock\"] pre');
-                codeBlocks.forEach(block => {{
-                    block.onclick = function() {{
-                        navigator.clipboard.writeText(block.innerText);
-                    }}
-                }});
-            </script>
-        """, height=0)
-    else:
-        st.info("🔹 Preencha os dois campos para gerar as mensagens do curso.")
+    st.components.v1.html(f"""
+        <script>
+            const msgs = window.parent.document.querySelectorAll('[data-testid=\"stCodeBlock\"] pre');
+            msgs.forEach(block => {{
+                block.onclick = function() {{
+                    navigator.clipboard.writeText(block.innerText);
+                }}
+            }});
+        </script>
+    """, height=0)
