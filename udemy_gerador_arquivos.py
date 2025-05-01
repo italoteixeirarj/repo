@@ -163,6 +163,8 @@ def gerar_csv_udemy(texto, nome_arquivo):
 
     df_csv = pd.DataFrame(questions, columns=CSV_HEADER)
     df_csv.to_csv(output, index=False)
+    output.seek(0)
+    return output.getvalue(), len(df_csv)
 
     st.success(f"✅ {len(df_csv)} questões processadas para CSV!")
 

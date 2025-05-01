@@ -49,6 +49,16 @@ def main():
                     gerar_xlsx(questoes, nome_arquivo)
                 else:
                     gerar_csv_udemy(texto, nome_arquivo)
+                    
+    elif formato == "CSV (Importação Udemy)":
+        csv_data, total = gerar_csv_udemy(texto)
+        st.success(f"✅ {total} questões processadas para CSV!")
+        st.download_button(
+            label="📥 Baixar CSV para Udemy",
+            data=csv_data,
+            file_name=f"{nome_arquivo}.csv",
+            mime="text/csv"
+        )
 
     elif aba == "titulo":
         gerar_titulo_certificacao()
