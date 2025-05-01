@@ -127,7 +127,7 @@ def gerar_csv_udemy(texto):
             continue
 
         question_text = ""
-        answers = []
+        all_lines = []
         correct_answers_text = []
         explanation = ""
         capture_mode = "question"
@@ -152,10 +152,11 @@ def gerar_csv_udemy(texto):
                 if line.lower().startswith("overall explanation"):
                     explanation = " ".join(lines[i+1:]).strip()
                     break
-                answers.append(line)
+                all_lines.append(line)
 
         question_text = question_text.strip()
-        answers = [a for a in answers if a.strip() and not a.lower().startswith("note") and not a.startswith("•")]
+        answers = [a for a in all_lines if a.strip() and not a.lower().startswith("note") and not a.startswith("•")]
+
         if len(answers) < 2:
             if "True" in correct_answers_text or "False" in correct_answers_text:
                 answers = ["True", "False"]
