@@ -9,6 +9,7 @@ from openpyxl.utils import get_column_letter
 from pathlib import Path as PathlibPath
 from openai import OpenAI
 import time
+import json
 
 CSV_HEADER = [
     "Question", "Question Type",
@@ -93,7 +94,10 @@ Texto:
 
         final_msg = client.beta.threads.messages.list(thread_id=THREAD_ID).data[0].content[0].text.value
         st.code(final_msg)  # Para debug visual
-        return eval(final_msg) if final_msg.startswith("{") else None
+        try:
+            return json.loads(final_msg)
+        except json.JSONDecodeError:
+            return None
 
     except Exception as e:
         st.error(f"Erro ao processar com IA: {e}")
@@ -131,7 +135,9 @@ def gerar_csv_udemy(texto):
 
 def gerar_pergunta_csv_com_ia(bloco):
     prompt = f"""
-Extraia a seguinte estrutura JSON da pergunta abaixo:
+Você é um assistente especialista em gerar arquivos CSV para a Udemy com base em perguntas de múltipla escolha.
+
+Extraia da pergunta abaixo a estrutura JSON exatamente no seguinte formato (não adicione comentários nem quebras extras):
 
 {{
   "Question": "...",
@@ -142,12 +148,19 @@ Extraia a seguinte estrutura JSON da pergunta abaixo:
   "Answer Option 4": "...",
   "Answer Option 5": "...",
   "Answer Option 6": "...",
-  "Correct Answers": "1,3",
+  "Correct Answers": "1" ou "1,3",
   "Overall Explanation": "...",
   "Domain": ""
 }}
 
-Texto:
+Regras:
+- Separe o enunciado da pergunta e as opções corretamente.
+- Sempre preencha no mínimo 2 opções de resposta.
+- Se houver uma ou mais respostas corretas, use números (1 a 6) no campo "Correct Answers".
+- Nunca coloque as opções dentro do texto da pergunta.
+- Retorne apenas o JSON e nada mais.
+
+Pergunta:
 {bloco.strip()}
 """
     try:
@@ -163,8 +176,12 @@ Texto:
             return None
 
         final_msg = client.beta.threads.messages.list(thread_id=THREAD_ID).data[0].content[0].text.value
-        st.code(final_msg)  # Para debug visual
-        return eval(final_msg) if final_msg.startswith("{") else None
+        st.markdown("🧠 **Resposta recebida da IA:**")
+        st.code(final_msg, language="json")
+        try:
+            return json.loads(final_msg)
+        except json.JSONDecodeError:
+            return None
 
     except Exception as e:
         st.error(f"Erro ao processar com IA: {e}")
