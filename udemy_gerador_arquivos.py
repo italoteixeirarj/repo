@@ -8,6 +8,7 @@ from openpyxl.styles import PatternFill
 from openpyxl.utils import get_column_letter
 import os
 from pathlib import Path as PathlibPath
+from openai import OpenAI
 
 CSV_HEADER = [
     "Question", "Question Type",
@@ -122,72 +123,49 @@ def gerar_csv_udemy(texto):
     blocks = re.split(r"(?=Question \d+\n)", texto.strip())
 
     for block in blocks:
-        lines = block.strip().splitlines()
-        if not lines or not lines[0].startswith("Question"):
-            continue
-
-        question_text = ""
-        all_lines = []
-        correct_answers_text = []
-        explanation = ""
-        capture_mode = "question"
-
-        for i, line in enumerate(lines):
-            line = line.strip()
-
-            if re.match(r"^Question \d+", line):
-                continue
-
-            if capture_mode == "question":
-                if line.lower().startswith("correct answer") or line.lower().startswith("correct selection"):
-                    capture_mode = "correct"
-                    continue
-                question_text += line + "\n"
-            elif capture_mode == "correct":
-                if line and not line.lower().startswith("overall explanation"):
-                    correct_answers_text.append(line)
-                else:
-                    capture_mode = "answers"
-            elif capture_mode == "answers":
-                if line.lower().startswith("overall explanation"):
-                    explanation = " ".join(lines[i+1:]).strip()
-                    break
-                all_lines.append(line)
-
-        question_text = question_text.strip()
-        answers = [a for a in all_lines if a.strip() and not a.lower().startswith("note") and not a.startswith("•")]
-
-        if len(answers) < 2:
-            if "True" in correct_answers_text or "False" in correct_answers_text:
-                answers = ["True", "False"]
-            while len(answers) < 2:
-                answers.append(f"Option {len(answers)+1}")
-
-        correct_indexes = []
-        for correct in correct_answers_text:
-            if correct in answers:
-                correct_indexes.append(answers.index(correct) + 1)
-
-        if not correct_indexes:
-            correct_indexes = [1]
-
-        question_type = "multi-select" if len(correct_indexes) > 1 else "multiple-choice"
-
-        qdata = {
-            "Question": question_text,
-            "Question Type": question_type,
-            "Correct Answers": ",".join(map(str, correct_indexes)),
-            "Overall Explanation": explanation,
-            "Domain": ""
-        }
-
-        for i in range(6):
-            qdata[f"Answer Option {i+1}"] = answers[i] if i < len(answers) else ""
-            qdata[f"Explanation {i+1}"] = ""
-
-        questions.append(qdata)
+        question_data = gerar_pergunta_csv_com_ia(block)
+        if question_data:
+            questions.append(question_data)
 
     df_csv = pd.DataFrame(questions, columns=CSV_HEADER)
     df_csv.to_csv(output, index=False)
     output.seek(0)
     return output.getvalue(), len(df_csv)
+
+def gerar_pergunta_csv_com_ia(bloco):
+    prompt = f"""
+Você é um assistente que extrai perguntas de simulados no formato Udemy CSV.
+A estrutura da pergunta é como no exemplo abaixo:
+
+Question: Pergunta completa
+Question Type: multiple-choice ou multi-select
+Answer Option 1: Opção A
+Answer Option 2: Opção B
+Answer Option 3: Opção C
+Answer Option 4: Opção D
+Answer Option 5: Opção E (se houver)
+Answer Option 6: Opção F (se houver)
+Correct Answers: índice(s) da(s) opção(ões) correta(s), separados por vírgula (ex: 1,3)
+Overall Explanation: Explicação detalhada
+Domain: (deixe em branco)
+
+Extraia os dados do seguinte bloco e me responda em JSON:
+{bloco.strip()}
+"""
+
+    client = OpenAI()
+    response = client.chat.completions.create(
+        model="gpt-4",
+        messages=[
+            {"role": "system", "content": "Você é um assistente para formatação de simulados Udemy."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.2
+    )
+
+    try:
+        content = response.choices[0].message.content.strip()
+        dados = eval(content) if content.startswith("{") else {}
+        return dados
+    except:
+        return None
