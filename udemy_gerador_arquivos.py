@@ -138,11 +138,9 @@ def gerar_csv_udemy(texto):
             if "Correct answer" in line or "Correct selection" in line:
                 if i + 1 < len(lines):
                     answer_text = lines[i + 1].strip()
+                    # Só marca como correta se já estiver na lista de alternativas
                     if answer_text in answers:
-                        idx = answers.index(answer_text) + 1
-                        if 1 <= idx <= 6:
-                            correct_indexes.append(idx)
-
+                        correct_indexes.append(answers.index(answer_text) + 1)
             elif line and not line.startswith("Overall explanation") and not line.startswith("Skipped") and not any(kw in line for kw in ["Correct answer", "Correct selection"]):
                 if line not in answers:
                     answers.append(line)
