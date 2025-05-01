@@ -7,7 +7,7 @@ from datetime import datetime
 from openpyxl.styles import PatternFill
 from openpyxl.utils import get_column_letter
 from pathlib import Path as PathlibPath
-from openai import OpenAI
+import openai
 
 CSV_HEADER = [
     "Question", "Question Type",
@@ -20,11 +20,11 @@ CSV_HEADER = [
     "Correct Answers", "Overall Explanation", "Domain"
 ]
 
-def obter_cliente_openai():
+def configurar_openai():
     api_key = st.secrets.get("OPENAI_API_KEY")
     if not api_key:
         raise ValueError("OPENAI_API_KEY não configurada em st.secrets.")
-    return OpenAI(api_key=api_key)
+    openai.api_key = api_key
 
 def processar_questoes(texto, origem):
     questoes = []
@@ -60,8 +60,8 @@ A partir do seguinte bloco, extraia esses campos e me retorne em formato JSON:
 {bloco.strip()}
 """
 
-    client = obter_cliente_openai()
-    response = client.chat.completions.create(
+    configurar_openai()
+    response = openai.ChatCompletion.create(
         model="gpt-4",
         messages=[
             {"role": "system", "content": "Você é um assistente para formatação de simulados em Excel."},
@@ -89,6 +89,7 @@ def gerar_xlsx(questoes, nome_arquivo):
             ws.column_dimensions[col_letter].width = 30
 
 def gerar_csv_udemy(texto):
+    configurar_openai()
     output = io.StringIO()
     questions = []
 
@@ -125,8 +126,7 @@ Extraia os dados do seguinte bloco e me responda em JSON:
 {bloco.strip()}
 """
 
-    client = obter_cliente_openai()
-    response = client.chat.completions.create(
+    response = openai.ChatCompletion.create(
         model="gpt-4",
         messages=[
             {"role": "system", "content": "Você é um assistente para formatação de simulados Udemy."},
