@@ -130,8 +130,7 @@ def gerar_csv_udemy(texto):
         answers = []
         correct_answers_text = []
         explanation = ""
-        parsing_answers = False
-        parsing_question = True
+        capture_mode = "question"
 
         for i, line in enumerate(lines):
             line = line.strip()
@@ -139,28 +138,24 @@ def gerar_csv_udemy(texto):
             if re.match(r"^Question \d+", line):
                 continue
 
-            if parsing_question:
+            if capture_mode == "question":
                 if line.lower().startswith("correct answer") or line.lower().startswith("correct selection"):
-                    parsing_question = False
-                    parsing_answers = True
-                    next_line = lines[i + 1].strip() if i + 1 < len(lines) else ""
-                    if next_line:
-                        correct_answers_text.append(next_line)
+                    capture_mode = "correct"
                     continue
-                elif line and not line.lower().startswith("skipped"):
-                    question_text += line + "\n"
-                    continue
-
-            if parsing_answers:
-                if line and line not in correct_answers_text and not any(kw in line.lower() for kw in ["correct answer", "correct selection", "overall explanation"]):
-                    answers.append(line)
-
-            if line.lower().startswith("overall explanation"):
-                explanation = " ".join(lines[i + 1:]).strip()
-                break
+                question_text += line + "\n"
+            elif capture_mode == "correct":
+                if line and not line.lower().startswith("overall explanation"):
+                    correct_answers_text.append(line)
+                else:
+                    capture_mode = "answers"
+            elif capture_mode == "answers":
+                if line.lower().startswith("overall explanation"):
+                    explanation = " ".join(lines[i+1:]).strip()
+                    break
+                answers.append(line)
 
         question_text = question_text.strip()
-        answers = [a for a in answers if not a.startswith("•") and a.strip()]
+        answers = [a for a in answers if a.strip() and not a.lower().startswith("note") and not a.startswith("•")]
         if len(answers) < 2:
             if "True" in correct_answers_text or "False" in correct_answers_text:
                 answers = ["True", "False"]
@@ -172,12 +167,13 @@ def gerar_csv_udemy(texto):
             if correct in answers:
                 correct_indexes.append(answers.index(correct) + 1)
 
-        question_type = "multi-select" if len(correct_indexes) > 1 else "multiple-choice"
         if not correct_indexes:
             correct_indexes = [1]
 
+        question_type = "multi-select" if len(correct_indexes) > 1 else "multiple-choice"
+
         qdata = {
-            "Question": question_text.strip(),
+            "Question": question_text,
             "Question Type": question_type,
             "Correct Answers": ",".join(map(str, correct_indexes)),
             "Overall Explanation": explanation,
