@@ -47,7 +47,7 @@ def main():
     aba = st.session_state.get("aba_udemy", "questoes")
 
     if aba == "questoes":
-        nome_arquivo = st.text_input("Nome do Practice Test (sem espaços):")
+        nome_arquivo = st.selectbox("Escolha o Practice Test:", [f"practice{i}" for i in range(1, 7)])
         texto = st.text_area("Cole o conteúdo das questões:")
         formato = st.radio("Escolha o formato de exportação:", ("XLSX (Organizado)", "CSV (Importação Udemy)"))
 
