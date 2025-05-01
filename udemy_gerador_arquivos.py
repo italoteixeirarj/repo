@@ -123,7 +123,6 @@ def gerar_csv_udemy(texto):
         answers = []
         correct_answers_text = []
         explanation = ""
-        in_question = False
         parsing_answers = False
 
         for i, line in enumerate(lines):
@@ -148,18 +147,15 @@ def gerar_csv_udemy(texto):
                 break
 
             if parsing_answers:
-                # Real alternatives come after correct selection
                 if line and line not in correct_answers_text and not any(kw in line.lower() for kw in ["correct answer", "correct selection", "overall explanation"]):
                     answers.append(line)
 
-        # Corrigir índice de respostas corretas com base nas opções coletadas
         correct_indexes = []
         for correct in correct_answers_text:
             if correct in answers:
                 correct_indexes.append(answers.index(correct) + 1)
 
         if not answers and correct_answers_text:
-            # fallback: caso não tenha capturado as respostas, mas temos verdadeiros/ falsos
             answers = ["True", "False"]
             for correct in correct_answers_text:
                 if correct.lower() == "true":
@@ -169,7 +165,7 @@ def gerar_csv_udemy(texto):
 
         question_type = "multi-select" if len(correct_indexes) > 1 else "multiple-choice"
         if not correct_indexes:
-            correct_indexes = [1]  # fallback padrão se falhar
+            correct_indexes = [1]
 
         qdata = {
             "Question": question_text.strip(),
