@@ -44,7 +44,7 @@ def main():
         if st.button("📑 Gerar Questões", use_container_width=True):
             st.session_state["aba_udemy"] = "questoes"
 
-    aba = st.session_state.get("aba_udemy", "questoes")
+    aba = st.session_state.get("aba_udemy", "titulo")
 
     if aba == "questoes":
         nome_arquivo = st.selectbox("Escolha o Practice Test:", [f"practice{i}" for i in range(1, 7)])
