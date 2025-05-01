@@ -1,4 +1,5 @@
 import streamlit as st
+from udemy_gerador_arquivos import gerar_csv_udemy
 
 # Configuração inicial
 st.set_page_config(page_title="Portal de Programas", layout="wide")
