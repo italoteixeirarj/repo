@@ -121,40 +121,61 @@ def gerar_csv_udemy(texto):
 
         question_text = ""
         answers = []
-        correct_indexes = []
+        correct_answers_text = []
+        explanation = ""
         in_question = False
+        parsing_answers = False
 
         for i, line in enumerate(lines):
             line = line.strip()
 
             if re.match(r"^Question \d+", line):
-                in_question = True
                 continue
 
-            if in_question and not question_text and line and line.upper() != "SKIPPED":
-                question_text = line
+            if not question_text and line and line.upper() != "SKIPPED":
+                question_text += line + " "
                 continue
 
-            if "Correct answer" in line or "Correct selection" in line:
-                if i + 1 < len(lines):
-                    answer_text = lines[i + 1].strip()
-                    if answer_text in answers:
-                        correct_indexes.append(answers.index(answer_text) + 1)
-            elif line and not line.startswith("Overall explanation") and not line.startswith("Skipped") and not any(kw in line for kw in ["Correct answer", "Correct selection"]):
-                if line not in answers:
+            if line.lower().startswith("correct answer") or line.lower().startswith("correct selection"):
+                parsing_answers = True
+                next_line = lines[i + 1].strip() if i + 1 < len(lines) else ""
+                if next_line:
+                    correct_answers_text.append(next_line)
+                continue
+
+            if line.lower().startswith("overall explanation"):
+                explanation = " ".join(lines[i + 1:]).strip()
+                break
+
+            if parsing_answers:
+                # Real alternatives come after correct selection
+                if line and line not in correct_answers_text and not any(kw in line.lower() for kw in ["correct answer", "correct selection", "overall explanation"]):
                     answers.append(line)
 
-        question_type = "multi-select" if len(correct_indexes) > 1 else "multiple-choice"
+        # Corrigir índice de respostas corretas com base nas opções coletadas
+        correct_indexes = []
+        for correct in correct_answers_text:
+            if correct in answers:
+                correct_indexes.append(answers.index(correct) + 1)
 
-        # Se não houver nenhuma resposta válida, ainda devemos colocar um valor ("1") para evitar erro na Udemy
+        if not answers and correct_answers_text:
+            # fallback: caso não tenha capturado as respostas, mas temos verdadeiros/ falsos
+            answers = ["True", "False"]
+            for correct in correct_answers_text:
+                if correct.lower() == "true":
+                    correct_indexes.append(1)
+                elif correct.lower() == "false":
+                    correct_indexes.append(2)
+
+        question_type = "multi-select" if len(correct_indexes) > 1 else "multiple-choice"
         if not correct_indexes:
-            correct_indexes = [1]
+            correct_indexes = [1]  # fallback padrão se falhar
 
         qdata = {
-            "Question": question_text,
+            "Question": question_text.strip(),
             "Question Type": question_type,
             "Correct Answers": ",".join(map(str, correct_indexes)),
-            "Overall Explanation": "",
+            "Overall Explanation": explanation,
             "Domain": ""
         }
 
