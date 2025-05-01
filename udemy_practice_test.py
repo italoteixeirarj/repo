@@ -367,8 +367,10 @@ def gerar_landing_page(nome_cert, cod_cert):
         caminho = "text/landing_default.md"
 
     descricao = carregar_md_personalizado(caminho, nome_cert, cod_cert)
-    descricao = descricao.replace("{num_questions}", str(num_questoes))
-    descricao = descricao.replace("{num_tests}", str(num_testes))
+    descricao = descricao.replace("{NOME_CERT}", nome_cert)
+    descricao = descricao.replace("{COD_CERT}", cod_cert)
+    descricao = descricao.replace("{TOTAL_QUESTOES}", str(num_questoes))
+    descricao = descricao.replace("{TOTAL_SIMULADOS}", str(num_testes))
 
     st.markdown("### Course Description")
     st.code(descricao.strip(), language="markdown")
@@ -384,6 +386,7 @@ def gerar_landing_page(nome_cert, cod_cert):
             }});
         </script>
     """, height=0)
+
 
 def gerar_course_messages():
     st.subheader("✉️ Gerar Course Messages")
