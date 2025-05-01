@@ -108,7 +108,7 @@ def gerar_xlsx(questoes, nome_arquivo):
             col_letter = get_column_letter(col_num)
             ws.column_dimensions[col_letter].width = 30
 
-def gerar_csv_udemy(texto, nome_arquivo):
+def gerar_csv_udemy(texto):
     output = io.StringIO()
     questions = []
 
@@ -165,12 +165,3 @@ def gerar_csv_udemy(texto, nome_arquivo):
     df_csv.to_csv(output, index=False)
     output.seek(0)
     return output.getvalue(), len(df_csv)
-
-    st.success(f"✅ {len(df_csv)} questões processadas para CSV!")
-
-    st.download_button(
-        label="📥 Baixar CSV para Udemy",
-        data=output.getvalue(),
-        file_name=f"{nome_arquivo}.csv",
-        mime="text/csv"
-    )
