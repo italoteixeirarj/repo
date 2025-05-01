@@ -23,7 +23,6 @@ CSV_HEADER = [
 ]
 
 ASSISTANT_ID = "asst_5TeFXS410FdC2LZvAvOIqa96"
-THREAD_ID = "thread_if3o6wb40CW91VBhFqr7K1b7"
 
 client = OpenAI()
 
@@ -81,18 +80,21 @@ Texto:
 {bloco.strip()}
 """
     try:
+        thread = client.beta.threads.create()
+        thread_id = thread.id
+
         client.beta.threads.messages.create(
-            thread_id=THREAD_ID,
+            thread_id=thread_id,
             role="user",
             content=prompt
         )
 
-        run = client.beta.threads.runs.create(thread_id=THREAD_ID, assistant_id=ASSISTANT_ID)
-        if not aguardar_resposta(THREAD_ID, run.id):
+        run = client.beta.threads.runs.create(thread_id=thread_id, assistant_id=ASSISTANT_ID)
+        if not aguardar_resposta(thread_id, run.id):
             st.error("❌ A execução da IA falhou ou foi cancelada.")
             return None
 
-        final_msg = client.beta.threads.messages.list(thread_id=THREAD_ID).data[0].content[0].text.value
+        final_msg = client.beta.threads.messages.list(thread_id=thread_id).data[0].content[0].text.value
         st.code(final_msg)  # Para debug visual
         try:
             return json.loads(final_msg)
@@ -164,18 +166,21 @@ Pergunta:
 {bloco.strip()}
 """
     try:
+        thread = client.beta.threads.create()
+        thread_id = thread.id
+
         client.beta.threads.messages.create(
-            thread_id=THREAD_ID,
+            thread_id=thread_id,
             role="user",
             content=prompt
         )
 
-        run = client.beta.threads.runs.create(thread_id=THREAD_ID, assistant_id=ASSISTANT_ID)
-        if not aguardar_resposta(THREAD_ID, run.id):
+        run = client.beta.threads.runs.create(thread_id=thread_id, assistant_id=ASSISTANT_ID)
+        if not aguardar_resposta(thread_id, run.id):
             st.error("❌ A execução da IA falhou ou foi cancelada.")
             return None
 
-        final_msg = client.beta.threads.messages.list(thread_id=THREAD_ID).data[0].content[0].text.value
+        final_msg = client.beta.threads.messages.list(thread_id=thread_id).data[0].content[0].text.value
         st.markdown("🧠 **Resposta recebida da IA:**")
         st.code(final_msg, language="json")
         try:
