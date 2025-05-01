@@ -7,6 +7,8 @@ import csv
 from datetime import datetime
 from openpyxl.styles import PatternFill
 from openpyxl.utils import get_column_letter
+from pathlib import Path as PathlibPath
+
 
 CSV_HEADER = [
     "Question", "Question Type",
