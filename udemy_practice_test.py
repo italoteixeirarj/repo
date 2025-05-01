@@ -356,7 +356,13 @@ def gerar_landing_page(nome_cert, cod_cert):
         st.warning("⚠️ Preencha o nome e o código da certificação para continuar.")
         return
 
-    # Determinar o template correto com base no código
+    # Campo 1 - Título do Curso
+    titulo = st.text_input("Título do Curso", value=st.session_state.get("titulo_gerado", ""), max_chars=60)
+
+    # Campo 2 - Subtítulo
+    subtitulo = st.text_input("Subtítulo do Curso (até 48 caracteres)", max_chars=48)
+
+    # Campo 3 - Descrição
     cod_key = cod_cert.lower().replace("-", "_")
     caminho = f"text/landing_{cod_key}.md"
     if not PathlibPath(caminho).exists():
