@@ -29,20 +29,20 @@ def main():
     col1, col2, col3, col4, col5 = st.columns(5)
 
     with col1:
-        if st.button("📑 Gerar Questões", use_container_width=True):
-            st.session_state["aba_udemy"] = "questoes"
-    with col2:
         if st.button("🎯 Gerar Título do Curso", use_container_width=True):
             st.session_state["aba_udemy"] = "titulo"
-    with col3:
+    with col2:
         if st.button("🧠 Gerar Intended Learners", use_container_width=True):
             st.session_state["aba_udemy"] = "learners"
-    with col4:
+    with col3:
         if st.button("🖋️ Gerar Landing Page", use_container_width=True):
             st.session_state["aba_udemy"] = "landing"
-    with col5:
+    with col4:
         if st.button("✉️ Gerar Course Messages", use_container_width=True):
             st.session_state["aba_udemy"] = "mensagens"
+    with col5:
+        if st.button("📑 Gerar Questões", use_container_width=True):
+            st.session_state["aba_udemy"] = "questoes"
 
     aba = st.session_state.get("aba_udemy", "questoes")
 
