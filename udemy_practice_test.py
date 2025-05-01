@@ -349,51 +349,35 @@ def carregar_template_mensagem(nome_arquivo):
             return f.read()
     return "Mensagem padrão ainda não disponível."
 
-def gerar_landing_page():
+def gerar_landing_page(nome_cert, cod_cert):
     st.subheader("🖋️ Gerar Landing Page")
 
-    nome_cert = st.text_input("Nome da Certificação", key="nome_cert_landing")
-    cod_cert = st.text_input("Código da Certificação", key="cod_cert_landing")
-    total_questoes = st.number_input("Quantidade total de questões", min_value=10, step=1)
-    total_simulados = st.number_input("Quantidade de simulados completos", min_value=1, step=1)
+    if not nome_cert or not cod_cert:
+        st.warning("⚠️ Preencha o nome e o código da certificação para continuar.")
+        return
 
-    if nome_cert and cod_cert and total_questoes > 0 and total_simulados > 0:
-        ano = datetime.now().year
-        title = f"[{ano}] {nome_cert} [{cod_cert}]"
-        subtitle = f"{nome_cert} Practice Tests [{cod_cert}] + Explanations + {total_questoes} Questions"
+    # Determinar o template correto com base no código
+    cod_key = cod_cert.lower().replace("-", "_")
+    caminho = f"text/landing_{cod_key}.md"
+    if not PathlibPath(caminho).exists():
+        caminho = "text/landing_default.md"
 
-        if "aws" in nome_cert.lower() or "aws" in cod_cert.lower():
-            modelo = carregar_template_descricao("aws_saa-c03")
-        elif "sap" in nome_cert.lower() or "sap" in cod_cert.lower():
-            modelo = carregar_template_descricao("sap_activate")
-        else:
-            modelo = carregar_template_descricao("default")
+    descricao = carregar_md_personalizado(caminho, nome_cert, cod_cert)
 
-        descricao = modelo.replace("{NOME_CERT}", nome_cert)
-        descricao = descricao.replace("{COD_CERT}", cod_cert)
-        descricao = descricao.replace("{TOTAL_QUESTOES}", str(total_questoes))
-        descricao = descricao.replace("{TOTAL_SIMULADOS}", str(total_simulados))
+    st.markdown("### Course Description")
+    st.code(descricao.strip(), language="markdown")
+    st.markdown("<div style='text-align: right; font-size: 0.75rem; color: gray; font-style: italic;'>Clique para copiar</div>", unsafe_allow_html=True)
 
-        st.markdown("**Título:**")
-        st.code(title)
-        st.markdown("**Subtítulo:**")
-        st.code(subtitle)
-        st.markdown("**Descrição:**")
-        st.code(descricao.strip())
-
-        st.markdown("<div style='text-align: right; font-size: 0.75rem; color: gray; font-style: italic;'>Clique para copiar</div>", unsafe_allow_html=True)
-        st.components.v1.html(f"""
-            <script>
-                const codeBlocks = window.parent.document.querySelectorAll('[data-testid="stCodeBlock"] pre');
-                codeBlocks.forEach(block => {{
-                    block.onclick = function() {{
-                        navigator.clipboard.writeText(block.innerText);
-                    }}
-                }});
-            </script>
-        """, height=0)
-    else:
-        st.info("🔹 Preencha todos os campos para gerar os textos da Landing Page.")
+    st.components.v1.html(f"""
+        <script>
+            const desc = window.parent.document.querySelectorAll('[data-testid=\"stCodeBlock\"] pre');
+            desc.forEach(block => {{
+                block.onclick = function() {{
+                    navigator.clipboard.writeText(block.innerText);
+                }}
+            }});
+        </script>
+    """, height=0)
 
 def gerar_course_messages():
     st.subheader("✉️ Gerar Course Messages")
