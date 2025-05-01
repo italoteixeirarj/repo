@@ -39,17 +39,23 @@ def processar_questoes(texto, origem):
     questoes = []
     blocos = re.split(r'Question \d+', texto)
 
+    total = len([b for b in blocos if b.strip()])
+    atual = 1
+
     for bloco in blocos:
         bloco = bloco.strip()
         if not bloco:
             continue
 
-        with st.spinner("🔄 Processando questão com IA..."):
+        with st.spinner(f"🔄 Processando questão {atual} de {total} com IA..."):
             question_data = gerar_pergunta_xlsx_com_ia(bloco)
+            st.code(question_data)
 
         if question_data:
             question_data["Origem"] = origem
             questoes.append(question_data)
+
+        atual += 1
 
     return questoes
 
@@ -80,13 +86,13 @@ Texto:
             content=prompt
         )
 
-        with st.spinner("🧠 Gerando resposta com Assistant..."):
-            run = client.beta.threads.runs.create(thread_id=thread.id, assistant_id=ASSISTANT_ID)
-            if not aguardar_resposta(thread.id, run.id):
-                st.error("❌ A execução da IA falhou ou foi cancelada.")
-                return None
+        run = client.beta.threads.runs.create(thread_id=thread.id, assistant_id=ASSISTANT_ID)
+        if not aguardar_resposta(thread.id, run.id):
+            st.error("❌ A execução da IA falhou ou foi cancelada.")
+            return None
 
         final_msg = client.beta.threads.messages.list(thread_id=thread.id).data[0].content[0].text.value
+        st.code(final_msg)  # Para debug visual
         return eval(final_msg) if final_msg.startswith("{") else None
 
     except Exception as e:
@@ -109,9 +115,11 @@ def gerar_csv_udemy(texto):
     questions = []
     blocks = re.split(r"(?=Question \d+\n)", texto.strip())
 
-    for block in blocks:
-        with st.spinner("🔄 Processando questão com IA..."):
+    total = len(blocks)
+    for idx, block in enumerate(blocks, 1):
+        with st.spinner(f"🔄 Processando questão {idx} de {total} com IA..."):
             question_data = gerar_pergunta_csv_com_ia(block)
+            st.code(question_data)
 
         if question_data:
             questions.append(question_data)
@@ -150,13 +158,13 @@ Texto:
             content=prompt
         )
 
-        with st.spinner("🧠 Gerando resposta com Assistant..."):
-            run = client.beta.threads.runs.create(thread_id=thread.id, assistant_id=ASSISTANT_ID)
-            if not aguardar_resposta(thread.id, run.id):
-                st.error("❌ A execução da IA falhou ou foi cancelada.")
-                return None
+        run = client.beta.threads.runs.create(thread_id=thread.id, assistant_id=ASSISTANT_ID)
+        if not aguardar_resposta(thread.id, run.id):
+            st.error("❌ A execução da IA falhou ou foi cancelada.")
+            return None
 
         final_msg = client.beta.threads.messages.list(thread_id=thread.id).data[0].content[0].text.value
+        st.code(final_msg)  # Para debug visual
         return eval(final_msg) if final_msg.startswith("{") else None
 
     except Exception as e:
