@@ -10,17 +10,6 @@ from openpyxl.utils import get_column_letter
 from pathlib import Path as PathlibPath
 from udemy_gerador_arquivos import processar_questoes, gerar_xlsx, gerar_csv_udemy
 
-CSV_HEADER = [
-    "Question", "Question Type",
-    "Answer Option 1", "Explanation 1",
-    "Answer Option 2", "Explanation 2",
-    "Answer Option 3", "Explanation 3",
-    "Answer Option 4", "Explanation 4",
-    "Answer Option 5", "Explanation 5",
-    "Answer Option 6", "Explanation 6",
-    "Correct Answers", "Overall Explanation", "Domain"
-]
-
 # === INTERFACE PRINCIPAL ===
 
 def main():
