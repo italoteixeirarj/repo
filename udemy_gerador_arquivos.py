@@ -160,22 +160,18 @@ def gerar_csv_udemy(texto):
         # Corrigir caso os bullets (•) entrem como alternativas
         answers = [a for a in answers if not a.startswith("•")]
 
-        # Corrigir se tiver menos de 2 opções
-        while len(answers) < 2:
-            answers.append(f"Option {len(answers)+1}")
+        # Corrigir se tiver menos de 2 opções válidas
+        answers = [a for a in answers if a]
+        if len(answers) < 2:
+            if "True" in correct_answers_text or "False" in correct_answers_text:
+                answers = ["True", "False"]
+            while len(answers) < 2:
+                answers.append(f"Option {len(answers)+1}")
 
         correct_indexes = []
         for correct in correct_answers_text:
             if correct in answers:
                 correct_indexes.append(answers.index(correct) + 1)
-
-        if not answers and correct_answers_text:
-            answers = ["True", "False"]
-            for correct in correct_answers_text:
-                if correct.lower() == "true":
-                    correct_indexes.append(1)
-                elif correct.lower() == "false":
-                    correct_indexes.append(2)
 
         question_type = "multi-select" if len(correct_indexes) > 1 else "multiple-choice"
         if not correct_indexes:
