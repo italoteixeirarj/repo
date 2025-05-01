@@ -26,6 +26,8 @@ ASSISTANT_ID = "asst_5TeFXS410FdC2LZvAvOIqa96"
 
 client = OpenAI()
 
+# Função para verificar se a execução da IA foi concluída
+
 def aguardar_resposta(thread_id, run_id, timeout=60):
     for _ in range(timeout):
         run_status = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run_id)
