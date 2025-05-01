@@ -6,7 +6,6 @@ import csv
 from datetime import datetime
 from openpyxl.styles import PatternFill
 from openpyxl.utils import get_column_letter
-import os
 from pathlib import Path as PathlibPath
 from openai import OpenAI
 
@@ -22,9 +21,9 @@ CSV_HEADER = [
 ]
 
 def obter_cliente_openai():
-    api_key = os.getenv("OPENAI_API_KEY")
+    api_key = st.secrets.get("OPENAI_API_KEY")
     if not api_key:
-        raise ValueError("OPENAI_API_KEY não configurada nas variáveis de ambiente.")
+        raise ValueError("OPENAI_API_KEY não configurada em st.secrets.")
     return OpenAI(api_key=api_key)
 
 def processar_questoes(texto, origem):
