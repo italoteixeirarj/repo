@@ -123,7 +123,7 @@ def get_dados_certificacao(scope=""):
 
 def carregar_md_personalizado(caminho, nome_cert, cod_cert):
     try:
-        texto = Path(caminho).read_text(encoding="utf-8")
+        texto = PathlibPath(caminho).read_text(encoding="utf-8")
         return texto.replace("{course_name}", nome_cert).replace("{course_code}", cod_cert)
     except FileNotFoundError:
         return "Arquivo de template não encontrado."
