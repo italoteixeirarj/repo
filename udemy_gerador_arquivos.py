@@ -162,7 +162,6 @@ def gerar_csv_udemy(texto, nome_arquivo):
         questions.append(qdata)
 
     df_csv = pd.DataFrame(questions, columns=CSV_HEADER)
-
     df_csv.to_csv(output, index=False)
 
     st.success(f"✅ {len(df_csv)} questões processadas para CSV!")
