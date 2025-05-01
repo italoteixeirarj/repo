@@ -1,4 +1,4 @@
-Are you getting ready for the **{NOME_CERT} – {COD_CERT}** exam and aiming to pass it on your first try? These top-quality Solution Architect - SAP BTP practice exams are exactly what you need to evaluate your readiness and boost your confidence!
+Are you getting ready for the **{NOME_CERT} – {COD_CERT}** exam and aiming to pass it on your first try? These top-quality {NOME_CERT} practice exams are exactly what you need to evaluate your readiness and boost your confidence!
 
 This collection includes **{TOTAL_SIMULADOS}** comprehensive sets of practice tests, each containing **{TOTAL_QUESTOES} practice questions** that closely match the level of difficulty found in the actual certification exam. These practice exams provide one of the most authentic experiences available on Udemy.
 
