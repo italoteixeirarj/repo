@@ -357,10 +357,12 @@ def gerar_landing_page(nome_cert, cod_cert):
         return
 
     titulo = st.text_input("Título do Curso", value=st.session_state.get("titulo_gerado", ""), max_chars=60)
-    subtitulo = st.text_input("Subtítulo do Curso (até 120 caracteres)", max_chars=120)
     num_questoes = st.number_input("Número de Questões", min_value=1, step=1)
     num_testes = st.number_input("Número de Testes", min_value=1, step=1)
     total_perguntas = num_questoes * num_testes
+
+    subtitulo_auto = f"Practice Test - {nome_cert} [{cod_cert}] + {total_perguntas} Questions"
+    subtitulo = st.text_input("Subtítulo do Curso (até 120 caracteres)", value=subtitulo_auto[:120], max_chars=120)
 
     cod_key = cod_cert.lower().replace("-", "_")
     caminho = f"text/landing_{cod_key}.md"
