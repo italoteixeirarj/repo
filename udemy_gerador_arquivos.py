@@ -1,10 +1,13 @@
+import streamlit as st
 import pandas as pd
+import io
 import re
 import csv
-import io
-from openpyxl import Workbook
+from datetime import datetime
 from openpyxl.styles import PatternFill
 from openpyxl.utils import get_column_letter
+import os
+from pathlib import Path as PathlibPath
 
 CSV_HEADER = [
     "Question", "Question Type",
@@ -69,9 +72,13 @@ def processar_questoes(texto, origem):
 
             else:
                 if linha and not linha.lower().startswith('note') and not linha.lower().startswith('skipped'):
-                    if linha.lower() in ['true', 'false']:
+                    if linha.startswith("•"):
+                        pergunta += "\n" + linha
+                    elif linha.lower() in ['true', 'false']:
                         encontrou_true_false = True
-                    opcoes.append(linha)
+                        opcoes.append(linha)
+                    else:
+                        opcoes.append(linha)
 
         if encontrou_true_false and not opcoes:
             opcoes = ["True", "False"]
@@ -149,6 +156,13 @@ def gerar_csv_udemy(texto):
             if parsing_answers:
                 if line and line not in correct_answers_text and not any(kw in line.lower() for kw in ["correct answer", "correct selection", "overall explanation"]):
                     answers.append(line)
+
+        # Corrigir caso os bullets (•) entrem como alternativas
+        answers = [a for a in answers if not a.startswith("•")]
+
+        # Corrigir se tiver menos de 2 opções
+        while len(answers) < 2:
+            answers.append(f"Option {len(answers)+1}")
 
         correct_indexes = []
         for correct in correct_answers_text:
