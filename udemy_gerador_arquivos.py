@@ -8,6 +8,7 @@ from openpyxl.styles import PatternFill
 from openpyxl.utils import get_column_letter
 from pathlib import Path as PathlibPath
 from openai import OpenAI
+import time
 
 CSV_HEADER = [
     "Question", "Question Type",
@@ -22,8 +23,17 @@ CSV_HEADER = [
 
 ASSISTANT_ID = "asst_5TeFXS410FdC2LZvAvOIqa96"
 
-# Inicializar cliente OpenAI com chave da variável de ambiente
 client = OpenAI()
+
+def aguardar_resposta(thread_id, run_id, timeout=60):
+    for _ in range(timeout):
+        run_status = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run_id)
+        if run_status.status == "completed":
+            return True
+        elif run_status.status in ["failed", "cancelled"]:
+            return False
+        time.sleep(1)
+    return False
 
 def processar_questoes(texto, origem):
     questoes = []
@@ -62,7 +72,6 @@ Retorne no seguinte formato:
 Texto:
 {bloco.strip()}
 """
-
     try:
         thread = client.beta.threads.create()
         client.beta.threads.messages.create(
@@ -72,10 +81,10 @@ Texto:
         )
 
         with st.spinner("🧠 Gerando resposta com Assistant..."):
-            response = client.beta.threads.run_and_poll(
-                thread_id=thread.id,
-                assistant_id=ASSISTANT_ID
-            )
+            run = client.beta.threads.runs.create(thread_id=thread.id, assistant_id=ASSISTANT_ID)
+            if not aguardar_resposta(thread.id, run.id):
+                st.error("❌ A execução da IA falhou ou foi cancelada.")
+                return None
 
         final_msg = client.beta.threads.messages.list(thread_id=thread.id).data[0].content[0].text.value
         return eval(final_msg) if final_msg.startswith("{") else None
@@ -133,7 +142,6 @@ Extraia a seguinte estrutura JSON da pergunta abaixo:
 Texto:
 {bloco.strip()}
 """
-
     try:
         thread = client.beta.threads.create()
         client.beta.threads.messages.create(
@@ -143,10 +151,10 @@ Texto:
         )
 
         with st.spinner("🧠 Gerando resposta com Assistant..."):
-            response = client.beta.threads.run_and_poll(
-                thread_id=thread.id,
-                assistant_id=ASSISTANT_ID
-            )
+            run = client.beta.threads.runs.create(thread_id=thread.id, assistant_id=ASSISTANT_ID)
+            if not aguardar_resposta(thread.id, run.id):
+                st.error("❌ A execução da IA falhou ou foi cancelada.")
+                return None
 
         final_msg = client.beta.threads.messages.list(thread_id=thread.id).data[0].content[0].text.value
         return eval(final_msg) if final_msg.startswith("{") else None
