@@ -8,7 +8,7 @@ from datetime import datetime
 from openpyxl.styles import PatternFill
 from openpyxl.utils import get_column_letter
 from pathlib import Path as PathlibPath
-from udemy_gerador_arquivos import processar_questoes, gerar_xlsx, gerar_csv_udemy
+from udemy_gerador_arquivos import processar_questoes, gerar_xlsx, gerar_csv_udemy, agregar_planilhas
 
 # === INTERFACE PRINCIPAL ===
 
