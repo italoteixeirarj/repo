@@ -61,7 +61,9 @@ def main():
                     )
 
         st.divider()
-        agregar_planilhas(None)
+        uploaded = st.file_uploader("Envie os arquivos para agregar", type=["xlsx", "csv"], accept_multiple_files=True)
+        if uploaded and st.button("🔄 Agregar Planilhas"):
+            agregar_planilhas(uploaded)
 
     elif aba == "titulo":
         gerar_titulo_certificacao()
@@ -80,6 +82,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 # === FUNCIONALIDADE: Gerar Título do Curso ===
 
