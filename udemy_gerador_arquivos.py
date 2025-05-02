@@ -23,7 +23,6 @@ CSV_HEADER = [
 ]
 
 ASSISTANT_ID = "asst_5TeFXS410FdC2LZvAvOIqa96"
-
 client = OpenAI()
 
 def aguardar_resposta(thread_id, run_id, timeout=60):
@@ -157,10 +156,9 @@ Extraia da pergunta abaixo a estrutura JSON exatamente no seguinte formato (não
 
 Regras:
 - Separe o enunciado da pergunta e as opções corretamente.
-- As opções devem estar listadas abaixo do enunciado, e não embutidas nele.
 - Sempre preencha no mínimo 2 opções de resposta.
-- Use apenas números de 1 a 6 no campo "Correct Answers".
-- Não confunda listas de enunciado com alternativas de resposta.
+- Se houver uma ou mais respostas corretas, use números (1 a 6) no campo "Correct Answers".
+- Nunca coloque as opções dentro do texto da pergunta.
 - Retorne apenas o JSON e nada mais.
 
 Pergunta:
@@ -182,7 +180,7 @@ Pergunta:
             return None
 
         final_msg = client.beta.threads.messages.list(thread_id=thread_id).data[0].content[0].text.value
-        st.markdown("🧑‍🧠 **Resposta recebida da IA:**")
+        st.markdown("🧠 **Resposta recebida da IA:**")
         st.code(final_msg, language="json")
         try:
             return json.loads(final_msg)
@@ -192,3 +190,29 @@ Pergunta:
     except Exception as e:
         st.error(f"Erro ao processar com IA: {e}")
         return None
+
+def agregar_planilhas(uploaded_files):
+    frames = []
+    for file in uploaded_files:
+        try:
+            df = pd.read_excel(file)
+            frames.append(df)
+        except Exception as e:
+            st.error(f"Erro ao ler o arquivo {file.name}: {e}")
+
+    if not frames:
+        st.warning("Nenhuma planilha válida foi carregada.")
+        return
+
+    df_final = pd.concat(frames, ignore_index=True)
+    buffer = io.BytesIO()
+    df_final.to_excel(buffer, index=False)
+    buffer.seek(0)
+
+    st.success(f"✅ {len(df_final)} questões agregadas com sucesso!")
+    st.download_button(
+        label="📥 Baixar Planilha Agregada",
+        data=buffer,
+        file_name="planilha_agregada.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
