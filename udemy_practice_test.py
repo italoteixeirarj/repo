@@ -65,12 +65,12 @@ def main():
         if ativar_agregador:
             uploaded = st.file_uploader("Envie os arquivos para agregar", type=["xlsx", "csv"], accept_multiple_files=True)
             tipo_saida = st.radio("Escolha o formato da planilha final:", ("CSV", "XLSX"))
-            ordenar_por = st.text_input("Ordenar por coluna (opcional, sensível a maiúsculas/minúsculas):")
 
             if uploaded is not None and len(uploaded) > 0:
                 if st.button("🔄 Agregar Planilhas"):
+                    ordered_files = sorted(uploaded, key=lambda f: f.name)
                     frames = []
-                    for file in uploaded:
+                    for file in ordered_files:
                         if file.name.endswith(".xlsx"):
                             df = pd.read_excel(file)
                         elif file.name.endswith(".csv"):
@@ -80,9 +80,6 @@ def main():
                         frames.append(df)
                     if frames:
                         df_final = pd.concat(frames, ignore_index=True)
-
-                        if ordenar_por and ordenar_por in df_final.columns:
-                            df_final = df_final.sort_values(by=ordenar_por)
 
                         if tipo_saida == "CSV":
                             buffer_csv = io.StringIO()
@@ -121,8 +118,6 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
 
 # === FUNCIONALIDADE: Gerar Título do Curso ===
 
