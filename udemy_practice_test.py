@@ -9,7 +9,7 @@ from openpyxl.styles import PatternFill
 from openpyxl.utils import get_column_letter
 from pathlib import Path as PathlibPath
 from udemy_gerador_arquivos import processar_questoes, gerar_xlsx, gerar_csv_udemy, agregar_planilhas
-from udemy_gerador_arquivos import gerar_titulo_certificacao, gerar_intended_learners, gerar_landing_page, gerar_course_messages, get_dados_certificacao
+# from udemy_gerador_arquivos import gerar_titulo_certificacao, gerar_intended_learners, gerar_landing_page, gerar_course_messages, get_dados_certificacao
 
 
 # === INTERFACE PRINCIPAL ===
