@@ -192,6 +192,9 @@ Pergunta:
         return None
 
 def agregar_planilhas(uploaded_files):
+    st.header("📎 Agregador de Planilhas")
+    st.markdown("Você pode carregar múltiplos arquivos `.xlsx` ou `.csv` para combiná-los em uma única planilha consolidada.")
+
     frames = []
     for file in uploaded_files:
         try:
