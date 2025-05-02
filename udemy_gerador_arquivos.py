@@ -195,7 +195,13 @@ def agregar_planilhas(uploaded_files):
     frames = []
     for file in uploaded_files:
         try:
-            df = pd.read_excel(file)
+            if file.name.endswith(".xlsx"):
+                df = pd.read_excel(file)
+            elif file.name.endswith(".csv"):
+                df = pd.read_csv(file)
+            else:
+                st.warning(f"Tipo de arquivo não suportado: {file.name}")
+                continue
             frames.append(df)
         except Exception as e:
             st.error(f"Erro ao ler o arquivo {file.name}: {e}")

@@ -27,7 +27,7 @@ def main():
         if st.button("🖋️ Gerar Landing Page", use_container_width=True):
             st.session_state["aba_udemy"] = "landing"
     with col4:
-        if st.button("✉️ Gerar Course Messages", use_container_width=True):
+        if st.button("⭐ Gerar Course Messages", use_container_width=True):
             st.session_state["aba_udemy"] = "mensagens"
     with col5:
         if st.button("📑 Gerar Questões", use_container_width=True):
