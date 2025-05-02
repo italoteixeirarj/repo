@@ -9,7 +9,6 @@ from openpyxl.styles import PatternFill
 from openpyxl.utils import get_column_letter
 from pathlib import Path as PathlibPath
 from udemy_gerador_arquivos import processar_questoes, gerar_xlsx, gerar_csv_udemy, agregar_planilhas
-# from udemy_gerador_arquivos import gerar_titulo_certificacao, gerar_intended_learners, gerar_landing_page, gerar_course_messages, get_dados_certificacao
 
 
 # === INTERFACE PRINCIPAL ===
@@ -62,8 +61,9 @@ def main():
 
         st.divider()
         uploaded = st.file_uploader("Envie os arquivos para agregar", type=["xlsx", "csv"], accept_multiple_files=True)
-        if uploaded and st.button("🔄 Agregar Planilhas"):
-            agregar_planilhas(uploaded)
+        if uploaded is not None and len(uploaded) > 0:
+            if st.button("🔄 Agregar Planilhas"):
+                agregar_planilhas(uploaded)
 
     elif aba == "titulo":
         gerar_titulo_certificacao()
