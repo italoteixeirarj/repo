@@ -9,8 +9,11 @@ from openpyxl.styles import PatternFill
 from openpyxl.utils import get_column_letter
 from pathlib import Path as PathlibPath
 from udemy_gerador_arquivos import processar_questoes, gerar_xlsx, gerar_csv_udemy, agregar_planilhas
+from udemy_gerador_arquivos import gerar_titulo_certificacao, gerar_intended_learners, gerar_landing_page, gerar_course_messages, get_dados_certificacao
+
 
 # === INTERFACE PRINCIPAL ===
+
 
 def main():
     st.title("📚 Udemy Practice Test Manager")
@@ -48,8 +51,6 @@ def main():
                     questoes = processar_questoes(texto, nome_arquivo)
                     gerar_xlsx(questoes, nome_arquivo)
                 else:
-                    from udemy_gerador_arquivos import gerar_csv_udemy
-
                     csv_data, total = gerar_csv_udemy(texto)
                     st.success(f"✅ {total} questões processadas para CSV!")
                     st.download_button(
@@ -58,6 +59,9 @@ def main():
                         file_name=f"{nome_arquivo}.csv",
                         mime="text/csv"
                     )
+
+        st.divider()
+        agregar_planilhas(None)
 
     elif aba == "titulo":
         gerar_titulo_certificacao()
@@ -73,6 +77,9 @@ def main():
     elif aba == "mensagens":
         nome_cert, cod_cert = get_dados_certificacao("mensagens")
         gerar_course_messages(nome_cert, cod_cert)
+
+if __name__ == "__main__":
+    main()
 
 # === FUNCIONALIDADE: Gerar Título do Curso ===
 
