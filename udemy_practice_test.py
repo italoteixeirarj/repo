@@ -63,7 +63,36 @@ def main():
         uploaded = st.file_uploader("Envie os arquivos para agregar", type=["xlsx", "csv"], accept_multiple_files=True)
         if uploaded is not None and len(uploaded) > 0:
             if st.button("🔄 Agregar Planilhas"):
-                agregar_planilhas(uploaded)
+                frames = []
+                for file in uploaded:
+                    if file.name.endswith(".xlsx"):
+                        df = pd.read_excel(file)
+                    elif file.name.endswith(".csv"):
+                        df = pd.read_csv(file)
+                    else:
+                        continue
+                    frames.append(df)
+                if frames:
+                    df_final = pd.concat(frames, ignore_index=True)
+
+                    buffer_csv = io.StringIO()
+                    df_final.to_csv(buffer_csv, index=False)
+                    st.download_button(
+                        label="📥 Baixar como CSV",
+                        data=buffer_csv.getvalue(),
+                        file_name="planilha_agregada.csv",
+                        mime="text/csv"
+                    )
+
+                    buffer_xlsx = io.BytesIO()
+                    df_final.to_excel(buffer_xlsx, index=False)
+                    buffer_xlsx.seek(0)
+                    st.download_button(
+                        label="📥 Baixar como XLSX",
+                        data=buffer_xlsx,
+                        file_name="planilha_agregada.xlsx",
+                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    )
 
     elif aba == "titulo":
         gerar_titulo_certificacao()
