@@ -76,8 +76,8 @@ def main():
                     st.write(f"{idx + 1}. {file.name}")
 
                 if st.button("🧹 Limpar fila de arquivos"):
-                    st.session_state.uploaded_files.clear()
-                    st.rerun()
+                    st.session_state.uploaded_files = []
+                    st.experimental_rerun()
 
                 tipo_saida = st.radio("Escolha o formato da planilha final:", ("CSV", "XLSX"))
 
@@ -114,7 +114,6 @@ def main():
                                 file_name="planilha_agregada.xlsx",
                                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                             )
-
 
     elif aba == "titulo":
         gerar_titulo_certificacao()
