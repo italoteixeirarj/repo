@@ -58,6 +58,28 @@ def main():
                         mime="text/csv"
                     )
 
+    if aba == "questoes":
+        nome_arquivo = st.selectbox("Escolha o Practice Test:", [f"practice{i}" for i in range(1, 7)])
+        texto = st.text_area("Cole o conteúdo das questões:")
+        formato = st.radio("Escolha o formato de exportação:", ("XLSX (Organizado)", "CSV (Importação Udemy)"))
+
+        if st.button("Gerar Arquivo"):
+            if not texto or not nome_arquivo:
+                st.warning("⚠️ Por favor, preencha todos os campos.")
+            else:
+                if formato == "XLSX (Organizado)":
+                    questoes = processar_questoes(texto, nome_arquivo)
+                    gerar_xlsx(questoes, nome_arquivo)
+                else:
+                    csv_data, total = gerar_csv_udemy(texto)
+                    st.success(f"✅ {total} questões processadas para CSV!")
+                    st.download_button(
+                        label="📥 Baixar CSV para Udemy",
+                        data=csv_data,
+                        file_name=f"{nome_arquivo}.csv",
+                        mime="text/csv"
+                    )
+
         st.divider()
         st.subheader("🗃️ Agregador de Planilhas")
         ativar_agregador = st.checkbox("Desejo agregar arquivos CSV ou XLSX")
@@ -114,6 +136,7 @@ def main():
                                 file_name="planilha_agregada.xlsx",
                                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                             )
+
 
     elif aba == "titulo":
         gerar_titulo_certificacao()
