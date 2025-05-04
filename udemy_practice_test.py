@@ -76,8 +76,8 @@ def main():
                     st.write(f"{idx + 1}. {file.name}")
 
                 if st.button("🧹 Limpar fila de arquivos"):
-                    st.session_state.uploaded_files = []
-                    st.experimental_rerun()
+                    st.session_state.uploaded_files.clear()
+                    st.success("🗑️ Fila de arquivos limpa com sucesso!")
 
                 tipo_saida = st.radio("Escolha o formato da planilha final:", ("CSV", "XLSX"))
 
