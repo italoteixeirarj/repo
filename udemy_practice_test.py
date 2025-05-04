@@ -75,10 +75,6 @@ def main():
                 for idx, file in enumerate(st.session_state.uploaded_files):
                     st.write(f"{idx + 1}. {file.name}")
 
-                if st.button("🧹 Limpar fila de arquivos"):
-                    st.session_state.uploaded_files.clear()
-                    st.success("🗑️ Fila de arquivos limpa com sucesso!")
-
                 tipo_saida = st.radio("Escolha o formato da planilha final:", ("CSV", "XLSX"))
 
                 if st.button("🔄 Agregar Planilhas"):
