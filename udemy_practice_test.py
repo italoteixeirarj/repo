@@ -63,22 +63,12 @@ def main():
         ativar_agregador = st.checkbox("Desejo agregar arquivos CSV ou XLSX")
 
         if ativar_agregador:
-            if "uploaded_files" not in st.session_state:
-                st.session_state.uploaded_files = []
+            uploaded = st.file_uploader("Envie os arquivos para agregar", type=["xlsx", "csv"], accept_multiple_files=True)
+            tipo_saida = st.radio("Escolha o formato da planilha final:", ("CSV", "XLSX"))
 
-            novos_uploads = st.file_uploader("Envie os arquivos para agregar", type=["xlsx", "csv"], accept_multiple_files=True)
-            if novos_uploads:
-                st.session_state.uploaded_files.extend(novos_uploads)
-
-            if st.session_state.uploaded_files:
-                st.markdown("### Arquivos na fila:")
-                for idx, file in enumerate(st.session_state.uploaded_files):
-                    st.write(f"{idx + 1}. {file.name}")
-
-                tipo_saida = st.radio("Escolha o formato da planilha final:", ("CSV", "XLSX"))
-
+            if uploaded is not None and len(uploaded) > 0:
                 if st.button("🔄 Agregar Planilhas"):
-                    ordered_files = sorted(st.session_state.uploaded_files, key=lambda f: f.name)
+                    ordered_files = sorted(uploaded, key=lambda f: f.name)
                     frames = []
                     for file in ordered_files:
                         if file.name.endswith(".xlsx"):
