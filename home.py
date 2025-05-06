@@ -27,14 +27,14 @@ elif page == "financeiro":
     planejamento_financeiro.main()
 
 elif page == "cursos":
-    import cursos_ai
-    cursos_ai.main()
+    import cursos
+    cursos.main()
 
 else:
     # Tela inicial do Portal
     st.title("🛠️ Portal de Programas")
 
-    col1, col2 = st.columns(2)
+    col1, col2, col3 = st.columns(3)
 
     with col1:
         if st.button("📚 Udemy Practice Test", key="udemy_button", use_container_width=True):
