@@ -81,14 +81,20 @@ def main():
 #    st.title("🚀 Cursos em Andamento")
 #    st.markdown("Escolha um curso para explorar sua trilha de aprendizado.")
 
-    if st.button("🧠 Engenheiro AI", use_container_width=True):
-        st.session_state["curso_ativo"] = "engenheiro_ai"
-        st.rerun()
+    if "curso_ativo" not in st.session_state:
+        st.session_state["curso_ativo"] = None
 
-    if st.session_state.get("curso_ativo") == "engenheiro_ai":
-        st.button("🔙 Voltar", on_click=lambda: st.session_state.pop("curso_ativo"))
+    if st.session_state["curso_ativo"] == "engenheiro_ai":
+        if st.button("🔙 Voltar"):
+            st.session_state["curso_ativo"] = None
+            st.experimental_rerun()
+
+        st.markdown("## 🧠 Trilha Engenheiro AI")
         exibir_trilha_engenheiro_ai()
 
+    else:
+        st.markdown("Escolha um curso para explorar sua trilha de aprendizado.")
+        if st.button("🧠 Engenheiro AI", use_container_width=True):
+            st.session_state["curso_ativo"] = "engenheiro_ai"
+            st.experimental_rerun()
 
-if __name__ == "__main__":
-    main()
