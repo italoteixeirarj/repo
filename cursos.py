@@ -16,3 +16,6 @@ def main():
 
     👉 Escolha o próximo módulo no menu lateral para começar!
     """)
+
+if __name__ == "__main__":
+    main()
