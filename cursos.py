@@ -3,22 +3,23 @@ import streamlit as st
 def main():
     st.title("🚀 Cursos em Andamento")
 
+    # Inicializa estado se não existir
     if "curso_ativo" not in st.session_state:
         st.session_state["curso_ativo"] = None
 
-    if st.session_state["curso_ativo"] == "engenheiro_ai":
-        if st.button("🔙 Voltar"):
-            st.session_state["curso_ativo"] = None
-            st.experimental_rerun()
-
-        st.markdown("## 🧠 Trilha Engenheiro AI")
-        exibir_trilha_engenheiro_ai()
-
-    else:
+    # Se curso ainda não foi selecionado
+    if st.session_state["curso_ativo"] is None:
         st.markdown("Escolha um curso para explorar sua trilha de aprendizado.")
         if st.button("🧠 Engenheiro AI", use_container_width=True):
             st.session_state["curso_ativo"] = "engenheiro_ai"
-            st.experimental_rerun()
+            st.rerun()
+
+    # Se um curso está ativo, mostra conteúdo e botão de voltar
+    elif st.session_state["curso_ativo"] == "engenheiro_ai":
+        if st.button("🔙 Voltar"):
+            st.session_state["curso_ativo"] = None
+            st.rerun()
+        exibir_trilha_engenheiro_ai()
 
 
 def exibir_trilha_engenheiro_ai():
