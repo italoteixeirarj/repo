@@ -26,6 +26,10 @@ elif page == "financeiro":
     import planejamento_financeiro
     planejamento_financeiro.main()
 
+elif page == "cursos":
+    import engenheiro_ai
+    engenheiro_ai.main()
+
 else:
     # Tela inicial do Portal
     st.title("🛠️ Portal de Programas")
@@ -40,4 +44,9 @@ else:
     with col2:
         if st.button("💰 Planejamento Financeiro", key="financeiro_button", use_container_width=True):
             st.query_params.update({"page": "financeiro"})
+            st.rerun()
+
+    with col3:
+        if st.button("📘 Cursos", use_container_width=True):
+            st.query_params.update({"page": "cursos"})
             st.rerun()
