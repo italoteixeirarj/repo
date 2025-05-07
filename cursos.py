@@ -2,7 +2,7 @@ import streamlit as st
 import streamlit.components.v1 as components
 from pathlib import Path
 
-MARKMAP_PATH = "/mnt/data/engenheiro_ai_markmap.md"
+MARKMAP_PATH = "/mount/src/repo/engenheiro_ai_markmap.md"
 
 
 def render_markmap(md_file_path):
