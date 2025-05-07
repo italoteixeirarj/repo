@@ -1,90 +1,89 @@
 import streamlit as st
+from streamlit_extras.stylable_container import stylable_container
+
+# Tópicos da trilha com descrições
+TOPICOS = [
+    {
+        "titulo": "Fundamentos de Programação",
+        "descricao": "Explore Python, Git, algoritmos e estruturas de dados essenciais para IA."
+    },
+    {
+        "titulo": "Matemática para IA",
+        "descricao": "Aprenda álgebra linear, cálculo, estatística e otimização aplicados à IA."
+    },
+    {
+        "titulo": "Fundamentos de Machine Learning",
+        "descricao": "Domine modelos supervisionados, avaliação, overfitting e feature engineering."
+    },
+    {
+        "titulo": "Deep Learning",
+        "descricao": "Estude redes neurais, CNNs, Transformers e os principais frameworks."
+    },
+    {
+        "titulo": "Engenharia de Prompt e LLMs",
+        "descricao": "Entenda técnicas de prompting, OpenAI, RAG e LangChain."
+    },
+    {
+        "titulo": "Implantação e MLOps",
+        "descricao": "Implemente projetos com Streamlit, FastAPI, CI/CD e monitore modelos em produção."
+    },
+    {
+        "titulo": "Projetos Práticos",
+        "descricao": "Aplique IA em projetos reais como classificadores, chatbots e sistemas de recomendação."
+    },
+]
+
+ESTADOS = ["Pendente", "Em andamento", "Concluído"]
 
 
-def exibir_trilha_engenheiro_ai():
-    st.header("🧠 Trilha: Engenheiro de Inteligência Artificial")
-    st.markdown("Explore os caminhos essenciais para se tornar um especialista em IA aplicada.")
+def exibir_trilha_interativa():
+    st.header("🧠 Trilha Engenheiro AI")
+    st.markdown("Bem-vindo à sua jornada para se tornar um especialista em Inteligência Artificial Aplicada!")
 
-    with st.expander("1. Fundamentos de Programação"):
-        st.markdown("""
-        - Python (básico a intermediário)
-        - Git e GitHub
-        - Orientação a Objetos
-        - Estruturas de Dados e Algoritmos
-        """)
+    col1, col2 = st.columns([1, 3])
 
-    with st.expander("2. Matemática para IA"):
-        st.markdown("""
-        - Álgebra Linear
-        - Cálculo
-        - Estatística e Probabilidade
-        - Otimização
-        """)
+    with col1:
+        st.subheader("📌 Tópicos")
+        for i, topico in enumerate(TOPICOS):
+            if st.button(topico["titulo"], key=f"botao_topico_{i}"):
+                st.session_state.topico_selecionado = i
 
-    with st.expander("3. Fundamentos de Machine Learning"):
-        st.markdown("""
-        - Modelos supervisionados e não supervisionados
-        - Avaliação de modelos
-        - Overfitting e underfitting
-        - Feature engineering
-        """)
+    with col2:
+        if "topico_selecionado" in st.session_state:
+            i = st.session_state.topico_selecionado
+            topico = TOPICOS[i]
+            st.subheader(f"📝 {topico['titulo']}")
+            st.markdown(topico["descricao"])
 
-    with st.expander("4. Deep Learning"):
-        st.markdown("""
-        - Redes Neurais Artificiais
-        - CNNs, RNNs, Transformers
-        - Frameworks: TensorFlow, PyTorch
-        - Treinamento em GPU e tuning de modelos
-        """)
+            estado = st.selectbox("📍 Marcar progresso:", ESTADOS, key=f"estado_{i}")
+            st.session_state[f"estado_topico_{i}"] = estado
 
-    with st.expander("5. Engenharia de Prompt e Modelos de Linguagem"):
-        st.markdown("""
-        - Fundamentos de LLMs
-        - Técnicas de Prompting
-        - OpenAI, LangChain e Assistants
-        - Aplicações com RAG (retrieval-augmented generation)
-        """)
+            st.markdown(f"**Status atual:** `{estado}`")
 
-    with st.expander("6. Implantação e MLOps"):
-        st.markdown("""
-        - Deployment com Streamlit, FastAPI, Gradio
-        - Versionamento de modelos
-        - Pipelines de CI/CD para ML
-        - Monitoramento e testes em produção
-        """)
-
-    with st.expander("7. Projetos Práticos"):
-        st.markdown("""
-        - Classificação de texto e imagem
-        - Chatbots com IA generativa
-        - Sistemas de recomendação
-        - Análise de sentimentos e dados em tempo real
-        """)
 
 def main():
     st.title("🚀 Cursos em Andamento")
 
-    # Inicializa o estado se não existir
     if "curso_ativo" not in st.session_state:
         st.session_state["curso_ativo"] = None
 
-    # Se nenhum curso estiver ativo, mostra os cursos disponíveis
     if st.session_state["curso_ativo"] is None:
         st.markdown("Escolha um curso para explorar sua trilha de aprendizado.")
         if st.button("🧠 Engenheiro AI", use_container_width=True):
             st.session_state["curso_ativo"] = "engenheiro_ai"
             st.rerun()
 
-    # Exibe o conteúdo do curso ativo
     elif st.session_state["curso_ativo"] == "engenheiro_ai":
         if st.button("🔙 Voltar ao Portal"):
             st.query_params.clear()
+            st.session_state["curso_ativo"] = None
             st.rerun()
-        exibir_trilha_engenheiro_ai()
+        exibir_trilha_interativa()
 
 
 if __name__ == "__main__":
     main()
+
 
 
 #def main():
