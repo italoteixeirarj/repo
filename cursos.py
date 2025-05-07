@@ -1,26 +1,5 @@
 import streamlit as st
 
-def main():
-    st.title("🚀 Cursos em Andamento")
-
-    # Inicializa estado se não existir
-    if "curso_ativo" not in st.session_state:
-        st.session_state["curso_ativo"] = None
-
-    # Se curso ainda não foi selecionado
-    if st.session_state["curso_ativo"] is None:
-        st.markdown("Escolha um curso para explorar sua trilha de aprendizado.")
-        if st.button("🧠 Engenheiro AI", use_container_width=True):
-            st.session_state["curso_ativo"] = "engenheiro_ai"
-            st.rerun()
-
-    # Se um curso está ativo, mostra conteúdo e botão de voltar
-    elif st.session_state["curso_ativo"] == "engenheiro_ai":
-        if st.button("🔙 Voltar"):
-            st.session_state["curso_ativo"] = None
-            st.rerun()
-        exibir_trilha_engenheiro_ai()
-
 
 def exibir_trilha_engenheiro_ai():
     st.header("🧠 Trilha: Engenheiro de Inteligência Artificial")
@@ -81,6 +60,32 @@ def exibir_trilha_engenheiro_ai():
         - Sistemas de recomendação
         - Análise de sentimentos e dados em tempo real
         """)
+
+def main():
+    st.title("🚀 Cursos em Andamento")
+
+    # Inicializa o estado se não existir
+    if "curso_ativo" not in st.session_state:
+        st.session_state["curso_ativo"] = None
+
+    # Se nenhum curso estiver ativo, mostra os cursos disponíveis
+    if st.session_state["curso_ativo"] is None:
+        st.markdown("Escolha um curso para explorar sua trilha de aprendizado.")
+        if st.button("🧠 Engenheiro AI", use_container_width=True):
+            st.session_state["curso_ativo"] = "engenheiro_ai"
+            st.rerun()
+
+    # Exibe o conteúdo do curso ativo
+    elif st.session_state["curso_ativo"] == "engenheiro_ai":
+        if st.button("🔙 Voltar ao Portal"):
+            st.query_params.clear()
+            st.rerun()
+        exibir_trilha_engenheiro_ai()
+
+
+if __name__ == "__main__":
+    main()
+
 
 #def main():
 
