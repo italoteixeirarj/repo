@@ -6,7 +6,10 @@ MARKMAP_PATH = "/mnt/data/engenheiro_ai_markmap.md"
 
 
 def render_markmap(md_file_path):
+    import html
     markdown_text = Path(md_file_path).read_text(encoding="utf-8")
+    markdown_escaped = html.escape(markdown_text)
+
     markmap_html = f"""
     <!DOCTYPE html>
     <html>
@@ -15,16 +18,16 @@ def render_markmap(md_file_path):
       <script src="https://cdn.jsdelivr.net/npm/markmap-autoloader"></script>
     </head>
     <body>
-      <pre>{markdown_text}</pre>
+      <pre>{markdown_escaped}</pre>
       <script>
-        window.markmapAutoLoader = {
-          onReady() {
+        window.markmapAutoLoader = {{
+          onReady() {{
             const els = document.querySelectorAll('pre');
-            for (const el of els) {
+            for (const el of els) {{
               window.markmap.autoLoader.default.transform(el);
-            }
-          }
-        };
+            }}
+          }}
+        }};
       </script>
     </body>
     </html>
