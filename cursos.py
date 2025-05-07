@@ -2,8 +2,7 @@ import streamlit as st
 import streamlit.components.v1 as components
 from pathlib import Path
 
-MARKMAP_PATH = "/mount/src/repo/engenheiro_ai_markmap.md"
-
+MARKMAP_PATH = "./engenheiro_ai_markmap.md"  # Caminho local do arquivo .md
 
 def render_markmap(md_file_path):
     import html
@@ -14,25 +13,40 @@ def render_markmap(md_file_path):
     <!DOCTYPE html>
     <html>
     <head>
-      <meta charset="utf-8">
-      <script src="https://cdn.jsdelivr.net/npm/markmap-autoloader"></script>
+        <meta charset="utf-8" />
+        <script src="https://cdn.jsdelivr.net/npm/markmap-autoloader"></script>
+        <style>
+            html, body {{
+                margin: 0;
+                padding: 0;
+                height: 100%;
+                width: 100%;
+                font-family: Arial, sans-serif;
+                background: white;
+            }}
+            svg {{
+                height: 100%;
+                width: 100%;
+            }}
+        </style>
     </head>
     <body>
-      <pre>{markdown_escaped}</pre>
-      <script>
-        window.markmapAutoLoader = {{
-          onReady() {{
-            const els = document.querySelectorAll('pre');
-            for (const el of els) {{
-              window.markmap.autoLoader.default.transform(el);
-            }}
-          }}
-        }};
-      </script>
+        <pre>{markdown_escaped}</pre>
+        <script>
+            window.markmapAutoLoader = {{
+                onReady() {{
+                    const els = document.querySelectorAll('pre');
+                    for (const el of els) {{
+                        window.markmap.autoLoader.default.transform(el);
+                    }}
+                }}
+            }};
+        </script>
     </body>
     </html>
     """
-    components.html(markmap_html, height=600, scrolling=True)
+
+    components.html(markmap_html, height=800, scrolling=True)
 
 
 def main():
@@ -48,14 +62,9 @@ def main():
             st.rerun()
 
     elif st.session_state["curso_ativo"] == "engenheiro_ai":
-        if st.button("🔙 Voltar ao Portal"):
-            st.query_params.clear()
-            st.session_state["curso_ativo"] = None
-            st.rerun()
-
+        st.button("🔙 Voltar ao Portal", on_click=lambda: st.session_state.update({"curso_ativo": None}))
         st.subheader("🧠 Trilha Engenheiro AI - Mapa Mental")
         render_markmap(MARKMAP_PATH)
-
 
 if __name__ == "__main__":
     main()
