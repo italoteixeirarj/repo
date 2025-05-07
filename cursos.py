@@ -2,7 +2,7 @@ import streamlit as st
 import streamlit.components.v1 as components
 
 # URL do HTML renderizado com Markmap
-MARKMAP_URL = ".\engenheiro_ai.html"  # Altere para o caminho real
+MARKMAP_URL = "./engenheiro_ai.html"  # Altere para o caminho real
 
 def render_markmap_iframe():
     components.iframe(MARKMAP_URL, height=600, scrolling=True)
