@@ -1,34 +1,30 @@
 from selenium import webdriver
+from selenium.webdriver.edge.service import Service as EdgeService
+from selenium.webdriver.edge.options import Options
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service
 import time
 
-# Caminho para o chromedriver no seu sistema
-caminho_chromedriver = '/caminho/para/chromedriver'
+# Caminho para o Edge WebDriver
+caminho_msedgedriver = 'C:\\edgedriver\\msedgedriver.exe'  # ajuste conforme o seu caminho
 
-# Número da nota SAP
-nota = '3552903'
-
-# Iniciar o navegador
-service = Service(caminho_chromedriver)
-options = webdriver.ChromeOptions()
+# Configurações do Edge
+options = Options()
 options.add_argument("--start-maximized")
 
-driver = webdriver.Chrome(service=service, options=options)
+service = EdgeService(executable_path=caminho_msedgedriver)
+driver = webdriver.Edge(service=service, options=options)
 
-# Abrir a nota diretamente
+# Número da nota
+nota = "3552903"
 url = f"https://launchpad.support.sap.com/#/notes/{nota}"
 driver.get(url)
 
-# Aguardar o login manual (ou automatizar se desejar)
-print("Por favor, faça login com seu S-user no navegador... aguardando 60s")
+print("⚠️ Faça login com seu S-user manualmente no navegador... Aguardando 60 segundos.")
 time.sleep(60)
 
-# Exemplo de como localizar o título da nota
+# Exemplo: buscar o título da nota após login
 try:
     title = driver.find_element(By.CLASS_NAME, "title").text
     print(f"Título da nota {nota}: {title}")
 except Exception as e:
-    print("Não foi possível capturar o título:", e)
-
-# Mantenha o navegador aberto se quiser inspecionar mais
+    print("❌ Não foi possível encontrar o título:", e)
