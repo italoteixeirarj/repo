@@ -1,38 +1,34 @@
-import streamlit as st
-import pandas as pd
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service
+import time
 
-st.title("Analisador de SAP Notes")
-st.write("Insira o número da SAP Note para extrair objetos técnicos, pré-requisitos e mais.")
+# Caminho para o chromedriver no seu sistema
+caminho_chromedriver = '/caminho/para/chromedriver'
 
-nota_sap = st.text_input("Número da SAP Note", "3552903")
+# Número da nota SAP
+nota = '3552903'
 
-if st.button("Analisar Nota"):
-    st.success(f"Analisando SAP Note {nota_sap}...")
+# Iniciar o navegador
+service = Service(caminho_chromedriver)
+options = webdriver.ChromeOptions()
+options.add_argument("--start-maximized")
 
-    dados = [
-        {
-            "Nota SAP": nota_sap,
-            "Tem Pré-requisitos?": "Sim",
-            "Objeto Técnico": "J_1B_NF_VALUE_DETERMINATION",
-            "Tipo de Objeto": "Função (FUNCTION)",
-            "Transações Impactadas": "J1B*NFE (estimado)"
-        },
-        {
-            "Nota SAP": nota_sap,
-            "Tem Pré-requisitos?": "Sim",
-            "Objeto Técnico": "LJ1BB2TOP",
-            "Tipo de Objeto": "Programa (REPS)",
-            "Transações Impactadas": "Transações com J1B*"
-        }
-    ]
+driver = webdriver.Chrome(service=service, options=options)
 
-    df = pd.DataFrame(dados)
-    st.dataframe(df)
+# Abrir a nota diretamente
+url = f"https://launchpad.support.sap.com/#/notes/{nota}"
+driver.get(url)
 
-    csv = df.to_csv(index=False).encode('utf-8')
-    st.download_button(
-        label="📥 Baixar planilha CSV",
-        data=csv,
-        file_name=f"impacto_nota_{nota_sap}.csv",
-        mime='text/csv',
-    )
+# Aguardar o login manual (ou automatizar se desejar)
+print("Por favor, faça login com seu S-user no navegador... aguardando 60s")
+time.sleep(60)
+
+# Exemplo de como localizar o título da nota
+try:
+    title = driver.find_element(By.CLASS_NAME, "title").text
+    print(f"Título da nota {nota}: {title}")
+except Exception as e:
+    print("Não foi possível capturar o título:", e)
+
+# Mantenha o navegador aberto se quiser inspecionar mais
