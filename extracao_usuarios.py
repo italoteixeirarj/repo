@@ -13,18 +13,20 @@ if uploaded_file:
         # Leitura do arquivo Excel
         df = pd.read_excel(uploaded_file)
 
-        # Nome das colunas conforme o padrão da planilha
+        # Nomes esperados das colunas
         col_usuario = 'Nome usuário'
-        col_mensagem_completa = 'Unnamed: 3'  # Onde está a frase com "failed (Reason=...)"
+        col_mensagem_completa = 'Unnamed: 3'
         col_transacao_extraida = 'Dados variáveis para mensagem'
+        col_data = 'Data da criação'
 
-        # Verificar se as colunas existem
-        if col_usuario not in df.columns or col_transacao_extraida not in df.columns or col_mensagem_completa not in df.columns:
-            st.error("A planilha não contém as colunas esperadas.")
+        # Verificação das colunas
+        colunas_necessarias = [col_usuario, col_transacao_extraida, col_mensagem_completa, col_data]
+        if not all(col in df.columns for col in colunas_necessarias):
+            st.error("A planilha não contém todas as colunas esperadas.")
         else:
-            # Selecionar colunas e remover nulos
-            df_filtrado = df[[col_usuario, col_transacao_extraida, col_mensagem_completa]].dropna()
-            df_filtrado.columns = ['Usuário', 'Transacao', 'MensagemCompleta']
+            # Filtrar e renomear colunas
+            df_filtrado = df[[col_usuario, col_transacao_extraida, col_mensagem_completa, col_data]].dropna()
+            df_filtrado.columns = ['Usuário', 'Transacao', 'MensagemCompleta', 'DataCriacao']
 
             # Remover transações indesejadas
             df_filtrado = df_filtrado[df_filtrado['Transacao'] != 'SESSION_MANAGER']
@@ -32,22 +34,31 @@ if uploaded_file:
                 ~df_filtrado['MensagemCompleta'].str.contains(r'Start of transaction .* failed \(Reason=(2|3) ?\)', case=False, na=False)
             ]
 
-            # Obter dataframe final sem duplicações
-            df_final = df_filtrado[['Usuário', 'Transacao']].drop_duplicates().sort_values(by=['Usuário', 'Transacao'])
+            # Converter data para tipo correto
+            df_filtrado['Data'] = pd.to_datetime(df_filtrado['DataCriacao']).dt.date
 
-            # 📈 Métricas
+            # Agrupar por usuário, transação e data
+            df_final = (
+                df_filtrado
+                .groupby(['Usuário', 'Transacao', 'Data'])
+                .size()
+                .reset_index(name='Quantidade de acessos')
+                .sort_values(by=['Usuário', 'Data', 'Transacao'])
+            )
+
+            # Métricas
             total_transacoes = df_final['Transacao'].nunique()
             total_usuarios = df_final['Usuário'].nunique()
 
-            # Mostrar métricas
             col1, col2 = st.columns(2)
             col1.metric("🔢 Transações distintas utilizadas", total_transacoes)
             col2.metric("👤 Usuários distintos", total_usuarios)
 
-            st.success(f"{len(df_final)} registros únicos extraídos.")
+            # Exibição
+            st.success(f"{len(df_final)} registros de transações por data e usuário.")
             st.dataframe(df_final, use_container_width=True, hide_index=True)
 
-            # Preparar planilha para download
+            # Preparar Excel para download
             output = io.BytesIO()
             with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
                 df_final.to_excel(writer, sheet_name='Transacoes por Usuario', index=False)
@@ -55,7 +66,7 @@ if uploaded_file:
 
             # Botão de download
             st.download_button(
-                label="📥 Baixar Excel com transações por usuário",
+                label="📥 Baixar relatório em Excel",
                 data=output,
                 file_name="transacoes_por_usuario.xlsx",
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
