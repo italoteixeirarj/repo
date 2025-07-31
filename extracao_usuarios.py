@@ -45,7 +45,7 @@ if uploaded_file:
             col2.metric("👤 Usuários distintos", total_usuarios)
 
             st.success(f"{len(df_final)} registros únicos extraídos.")
-            st.dataframe(df_final, use_container_width=True)
+            st.dataframe(df_final, use_container_width=True, hide_index=True)
 
             # Preparar planilha para download
             output = io.BytesIO()
