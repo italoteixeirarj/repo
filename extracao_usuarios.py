@@ -35,8 +35,16 @@ if uploaded_file:
             # Obter dataframe final sem duplicações
             df_final = df_filtrado[['Usuário', 'Transacao']].drop_duplicates().sort_values(by=['Usuário', 'Transacao'])
 
-            # Exibir resultado
-            st.success(f"{len(df_final)} registros únicos extraídos (excluindo SESSION_MANAGER e falhas).")
+            # 📈 Métricas
+            total_transacoes = df_final['Transacao'].nunique()
+            total_usuarios = df_final['Usuário'].nunique()
+
+            # Mostrar métricas
+            col1, col2 = st.columns(2)
+            col1.metric("🔢 Transações distintas utilizadas", total_transacoes)
+            col2.metric("👤 Usuários distintos", total_usuarios)
+
+            st.success(f"{len(df_final)} registros únicos extraídos.")
             st.dataframe(df_final, use_container_width=True)
 
             # Preparar planilha para download
