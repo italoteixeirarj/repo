@@ -22,7 +22,7 @@ CSV_HEADER = [
     "Correct Answers", "Overall Explanation", "Domain"
 ]
 
-ASSISTANT_ID = "asst_5TeFXS410FdC2LZvAvOIqa96"
+ASSISTANT_ID = "asst_Fy5zh8iu3OZDHsNMoMrtXaCT"
 client = OpenAI()
 
 def aguardar_resposta(thread_id, run_id, timeout=60):
@@ -224,4 +224,5 @@ def agregar_planilhas(uploaded_files):
         data=buffer,
         file_name="planilha_agregada.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+
     )
